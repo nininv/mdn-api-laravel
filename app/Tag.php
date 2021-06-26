@@ -27,7 +27,8 @@ class Tag extends Model
         'SERIAL_NUMBER_UNIT'   => 'serial_number_unit',
         'CAPACITY_UTILIZATION' => 'capacity_utilization',
         'ENERGY_CONSUMPTION'   => 'energy_consumption',
-        'RUNNING'              => 'running'
+        'RUNNING'              => 'running',
+        'IDLE'                 => 'idle'
     ];
 
 	protected $cacheFor = 3600;

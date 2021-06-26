@@ -32,6 +32,9 @@ use App\Report;
 use App\Alarm;
 use App\AvailabilityPlanTime;
 use App\HopperClearedTime;
+use App\Idle;
+use App\ActiveAlarms;
+use App\Threshold;
 use App\Exports\MachinesReportSheetExport;
 use App\Mail\RequestService;
 use GuzzleHttp\Client;
@@ -116,6 +119,81 @@ class MachineController extends Controller
 				}
             }
         }
+
+        return false;
+    }
+
+	public function isMachineRunning($deviceId, $machineId)
+    {
+        $tag = Tag::where('configuration_id', $machineId)
+            ->where('tag_name', Tag::NAMES['RUNNING'])
+            ->first();
+
+        if ($tag) {
+            $running = Running::where('device_id', $deviceId)
+                ->where('tag_id', $tag->tag_id)
+                ->latest('timestamp')
+                ->first();
+
+            if ($running) {
+                return json_decode($running->values)[0];
+            }
+        }
+
+        return false;
+    }
+
+    public function isMachineIdle($deviceId, $machineId)
+    {
+        $tag = Tag::where('configuration_id', $machineId)
+            ->where('tag_name', Tag::NAMES['IDLE'])
+            ->first();
+
+        if ($tag) {
+            $idle = Idle::where('device_id', $deviceId)
+                ->where('tag_id', $tag->tag_id)
+                ->latest('timestamp')
+                ->first();
+
+            if ($idle) {
+                return json_decode($idle->values)[0];
+            }
+
+            return false;
+        }
+    }
+
+    public function isPlcAlarmActivated($deviceId, $machineId)
+    {
+        $activeAlarm = ActiveAlarms::where('device_id', $deviceId)
+            ->where('machine_id', $machineId)
+            ->first();
+
+        if ($activeAlarm) return true;
+
+        return false;
+    }
+
+    public function isThresholdsActivated($teltonikaId, $machineId, $userId)
+    {
+        $threshold = Threshold::where('device_id', $teltonikaId)
+            ->where('user_id', $userId)
+            ->where('threshold_activated', true)
+            ->first();
+
+        if ($threshold) return true;
+
+        return false;
+    }
+
+    public function isApproachingActivated($teltonikaId, $machineId, $userId)
+    {
+        $approaching = Threshold::where('device_id', $teltonikaId)
+            ->where('user_id', $userId)
+            ->where('approaching_activated', true)
+            ->first();
+
+        if ($approaching) return true;
 
         return false;
     }
@@ -458,7 +536,6 @@ class MachineController extends Controller
 
 		if ($configuration) {
 			$product->teltonikaDevice = Device::where('serial_number', $configuration->teltonika_id)->first();
-			$plcLinkStatus = $configuration->plc_status;
 		}
 
 		if ($request->machineId == MACHINE_VTC_PLUS_CONVEYING_SYSTEM) {
@@ -472,24 +549,48 @@ class MachineController extends Controller
 			}
 		}
 
-		$product->running = $this->isPlcRunning($request->machineId, $request->serialNumber);
-
 		$saved_machine = SavedMachine::where('user_id', $user->id)
 									->where('device_id', $product->teltonikaDevice->id)->first();
 
+		$product->status = [];
+
+		if ($configuration && $configuration->plc_status) {
+			$plcLinkStatus = true;
+		} else {
+			$plcLinkStatus = false;
+		}
+
 		$plcStatus = $this->getPlcStatus($product->teltonikaDevice->device_id);
+		$isRunning = $this->isMachineRunning($product->teltonikaDevice->serial_number, $product->teltonikaDevice->machine_id);
+		$isIdle = $this->isMachineIdle($product->teltonikaDevice->serial_number, $product->teltonikaDevice->machine_id);
+		$isActivePlcAlarm = $this->isPlcAlarmActivated($product->teltonikaDevice->serial_number, $product->teltonikaDevice->machine_id);
+		$isThresholdActivated = $this->isThresholdsActivated($product->teltonikaDevice->device_id, $product->teltonikaDevice->machine_id, $user->id);
+		$isApproachingActivated = $this->isApproachingActivated($product->teltonikaDevice->device_id, $product->teltonikaDevice->machine_id, $user->id);
 
 		if (!isset($plcStatus->status)) {
-			$product->status = 'routerNotConnected';
+			array_push($product->status, 'routerNotConnected');
 		} else {
-			if($plcStatus->status != 1) {
-				$product->status = 'routerNotConnected';
-			} else if (!$plcLinkStatus) {
-				$product->status = 'plcNotConnected';
-			} else if ($product->running) {
-				$product->status = 'running';
+			if ($plcStatus->status != 1) {
+				array_push($product->status, 'routerNotConnected');
 			} else {
-				$product->status = 'shutOff';
+				if (!$plcLinkStatus) {
+					array_push($product->status, 'plcNotConnected');
+				} else {
+					if (!$isRunning) {
+						array_push($product->status, 'machineStopped');
+						if ($isActivePlcAlarm) array_push($product->status, 'machineStoppedActiveAlarm');
+					} else {
+						if ($isIdle) array_push($product->status, 'machineIdle');
+						else {
+							if ($isActivePlcAlarm) array_push($product->status, 'machineRunningAlert');
+							else {
+								if ($isThresholdActivated) array_push($product->status, 'machineRunningThreshold');
+								else if ($isApproachingActivated) array_push($product->status, 'machineRunningAlert');
+								else array_push($product->status, 'machineRunning');
+							}
+						}
+					}
+				}
 			}
 		}
 

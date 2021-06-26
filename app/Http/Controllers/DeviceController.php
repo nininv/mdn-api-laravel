@@ -27,6 +27,9 @@ use App\DowntimeReason;
 use App\Role;
 use App\AvailabilityPlanTime;
 use App\Timezone;
+use App\Idle;
+use App\ActiveAlarms;
+use App\Threshold;
 use App\Imports\DevicesImport;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Pipeline\Pipeline;
@@ -103,6 +106,81 @@ class DeviceController extends Controller
                 return json_decode($running->values)[0];
             }
         }
+
+        return false;
+    }
+
+    public function isMachineRunning($deviceId, $machineId)
+    {
+        $tag = Tag::where('configuration_id', $machineId)
+            ->where('tag_name', Tag::NAMES['RUNNING'])
+            ->first();
+
+        if ($tag) {
+            $running = Running::where('device_id', $deviceId)
+                ->where('tag_id', $tag->tag_id)
+                ->latest('timestamp')
+                ->first();
+
+            if ($running) {
+                return json_decode($running->values)[0];
+            }
+        }
+
+        return false;
+    }
+
+    public function isMachineIdle($deviceId, $machineId)
+    {
+        $tag = Tag::where('configuration_id', $machineId)
+            ->where('tag_name', Tag::NAMES['IDLE'])
+            ->first();
+
+        if ($tag) {
+            $idle = Idle::where('device_id', $deviceId)
+                ->where('tag_id', $tag->tag_id)
+                ->latest('timestamp')
+                ->first();
+
+            if ($idle) {
+                return json_decode($idle->values)[0];
+            }
+
+            return false;
+        }
+    }
+
+    public function isPlcAlarmActivated($deviceId, $machineId)
+    {
+        $activeAlarm = ActiveAlarms::where('device_id', $deviceId)
+            ->where('machine_id', $machineId)
+            ->first();
+
+        if ($activeAlarm) return true;
+
+        return false;
+    }
+
+    public function isThresholdsActivated($teltonikaId, $machineId, $userId)
+    {
+        $threshold = Threshold::where('device_id', $teltonikaId)
+            ->where('user_id', $userId)
+            ->where('threshold_activated', true)
+            ->first();
+
+        if ($threshold) return true;
+
+        return false;
+    }
+
+    public function isApproachingActivated($teltonikaId, $machineId, $userId)
+    {
+        $approaching = Threshold::where('device_id', $teltonikaId)
+            ->where('user_id', $userId)
+            ->where('approaching_activated', true)
+            ->first();
+
+        if ($approaching) return true;
 
         return false;
     }
@@ -722,11 +800,7 @@ class DeviceController extends Controller
         $query->with(['teltonikaConfiguration', 'configuration:id,name']);
         $devices = $query->paginate($itemsPerPage, ['*'], 'page', $page);
         foreach ($devices as $key => $device) {
-            if ($device->teltonikaConfiguration && $device->teltonikaConfiguration->plc_serial_number) {
-                $running = $this->isPlcRunning($device->machine_id, $device->teltonikaConfiguration->plc_serial_number);
-            } else {
-                $running = false;
-            }
+            $runningStatus = [];
 
             if ($device->teltonikaConfiguration && $device->teltonikaConfiguration->plc_status) {
                 $plcLinkStatus = true;
@@ -734,29 +808,41 @@ class DeviceController extends Controller
                 $plcLinkStatus = false;
             }
 
-            // $plcStatus = $this->getPlcStatus($device->device_id);
+            $plcStatus = $this->getPlcStatus($device->device_id);
+            $isRunning = $this->isMachineRunning($device->serial_number, $device->machine_id);
+            $isIdle = $this->isMachineIdle($device->serial_number, $device->machine_id);
+            $isActivePlcAlarm = $this->isPlcAlarmActivated($device->serial_number, $device->machine_id);
+            $isThresholdActivated = $this->isThresholdsActivated($device->device_id, $device->machine_id, $user->id);
+            $isApproachingActivated = $this->isApproachingActivated($device->device_id, $device->machine_id, $user->id);
 
-            // if (!isset($plcStatus->status)) {
-            //     $device->status = 'routerNotConnected';
-            // } else {
-            //     if($plcStatus->status != 1) {
-            //         $device->status = 'routerNotConnected';
-            //     } else if (!$plcLinkStatus) {
-            //         $device->status = 'plcNotConnected';
-            //     } else if ($running) {
-            //         $device->status = 'running';
-            //     } else {
-            //         $device->status = 'shutOff';
-            //     }
-            // }
-
-            if (!$plcLinkStatus) {
-                $device->status = 'plcNotConnected';
-            } else if ($running) {
-                $device->status = 'running';
+            if (!isset($plcStatus->status)) {
+                array_push($runningStatus, 'routerNotConnected');
             } else {
-                $device->status = 'shutOff';
+                if ($plcStatus->status != 1) {
+                    array_push($runningStatus, 'routerNotConnected');
+                } else {
+                    if (!$plcLinkStatus) {
+                        array_push($runningStatus, 'plcNotConnected');
+                    } else {
+                        if (!$isRunning) {
+                            array_push($runningStatus, 'machineStopped');
+                            if ($isActivePlcAlarm) array_push($runningStatus, 'machineStoppedActiveAlarm');
+                        } else {
+                            if ($isIdle) array_push($runningStatus, 'machineIdle');
+                            else {
+                                if ($isActivePlcAlarm) array_push($runningStatus, 'machineRunningAlert');
+                                else {
+                                    if ($isThresholdActivated) array_push($runningStatus, 'machineRunningThreshold');
+                                    else if ($isApproachingActivated) array_push($runningStatus, 'machineRunningAlert');
+                                    else array_push($runningStatus, 'machineRunning');
+                                }
+                            }
+                        }
+                    }
+                }
             }
+
+            $device->status = $runningStatus;
 
             $downtime_by_reason = $this->getDowntimeByReasonForMachine($device->serial_number);
             $capacity_utilization = $this->getCapacityUtilizationForMachine($device->serial_number, $device->machine_id);
@@ -783,11 +869,7 @@ class DeviceController extends Controller
         $devices = $query->paginate($itemsPerPage, ['*'], 'page', $page);
 
         foreach ($devices as $key => $device) {
-            if ($device->teltonikaConfiguration && $device->teltonikaConfiguration->plc_serial_number) {
-                $running = $this->isPlcRunning($device->machine_id, $device->teltonikaConfiguration->plc_serial_number);
-            } else {
-                $running = false;
-            }
+            $runningStatus = [];
 
             if ($device->teltonikaConfiguration && $device->teltonikaConfiguration->plc_status) {
                 $plcLinkStatus = true;
@@ -796,20 +878,40 @@ class DeviceController extends Controller
             }
 
             $plcStatus = $this->getPlcStatus($device->device_id);
+            $isRunning = $this->isMachineRunning($device->serial_number, $device->machine_id);
+            $isIdle = $this->isMachineIdle($device->serial_number, $device->machine_id);
+            $isActivePlcAlarm = $this->isPlcAlarmActivated($device->serial_number, $device->machine_id);
+            $isThresholdActivated = $this->isThresholdsActivated($device->device_id, $device->machine_id, $user->id);
+            $isApproachingActivated = $this->isApproachingActivated($device->device_id, $device->machine_id, $user->id);
 
             if (!isset($plcStatus->status)) {
-                $device->status = 'routerNotConnected';
+                array_push($runningStatus, 'routerNotConnected');
             } else {
                 if ($plcStatus->status != 1) {
-                    $device->status = 'routerNotConnected';
-                } else if (!$plcLinkStatus) {
-                    $device->status = 'plcNotConnected';
-                } else if ($running) {
-                    $device->status = 'running';
+                    array_push($runningStatus, 'routerNotConnected');
                 } else {
-                    $device->status = 'shutOff';
+                    if (!$plcLinkStatus) {
+                        array_push($runningStatus, 'plcNotConnected');
+                    } else {
+                        if (!$isRunning) {
+                            array_push($runningStatus, 'machineStopped');
+                            if ($isActivePlcAlarm) array_push($runningStatus, 'machineStoppedActiveAlarm');
+                        } else {
+                            if ($isIdle) array_push($runningStatus, 'machineIdle');
+                            else {
+                                if ($isActivePlcAlarm) array_push($runningStatus, 'machineRunningAlert');
+                                else {
+                                    if ($isThresholdActivated) array_push($runningStatus, 'machineRunningThreshold');
+                                    else if ($isApproachingActivated) array_push($runningStatus, 'machineRunningAlert');
+                                    else array_push($runningStatus, 'machineRunning');
+                                }
+                            }
+                        }
+                    }
                 }
             }
+
+            $device->status = $runningStatus;
 
             $capacity_utilization = $this->getCapacityUtilizationForMachine($device->serial_number, $device->machine_id);
             $device->capacityUtilization = $capacity_utilization;
@@ -836,11 +938,7 @@ class DeviceController extends Controller
         $devices = $query->paginate($request->itemsPerPage, ['*'], 'page', $page);
 
         foreach ($devices as $key => $device) {
-            if ($device->teltonikaConfiguration && $device->teltonikaConfiguration->plc_serial_number) {
-                $running = $this->isPlcRunning($device->machine_id, $device->teltonikaConfiguration->plc_serial_number);
-            } else {
-                $running = false;
-            }
+            $runningStatus = [];
 
             if ($device->teltonikaConfiguration && $device->teltonikaConfiguration->plc_status) {
                 $plcLinkStatus = true;
@@ -849,20 +947,40 @@ class DeviceController extends Controller
             }
 
             $plcStatus = $this->getPlcStatus($device->device_id);
+            $isRunning = $this->isMachineRunning($device->serial_number, $device->machine_id);
+            $isIdle = $this->isMachineIdle($device->serial_number, $device->machine_id);
+            $isActivePlcAlarm = $this->isPlcAlarmActivated($device->serial_number, $device->machine_id);
+            $isThresholdActivated = $this->isThresholdsActivated($device->device_id, $device->machine_id, $user->id);
+            $isApproachingActivated = $this->isApproachingActivated($device->device_id, $device->machine_id, $user->id);
 
             if (!isset($plcStatus->status)) {
-                $device->status = 'routerNotConnected';
+                array_push($runningStatus, 'routerNotConnected');
             } else {
                 if ($plcStatus->status != 1) {
-                    $device->status = 'routerNotConnected';
-                } else if (!$plcLinkStatus) {
-                    $device->status = 'plcNotConnected';
-                } else if ($running) {
-                    $device->status = 'running';
+                    array_push($runningStatus, 'routerNotConnected');
                 } else {
-                    $device->status = 'shutOff';
+                    if (!$plcLinkStatus) {
+                        array_push($runningStatus, 'plcNotConnected');
+                    } else {
+                        if (!$isRunning) {
+                            array_push($runningStatus, 'machineStopped');
+                            if ($isActivePlcAlarm) array_push($runningStatus, 'machineStoppedActiveAlarm');
+                        } else {
+                            if ($isIdle) array_push($runningStatus, 'machineIdle');
+                            else {
+                                if ($isActivePlcAlarm) array_push($runningStatus, 'machineRunningAlert');
+                                else {
+                                    if ($isThresholdActivated) array_push($runningStatus, 'machineRunningThreshold');
+                                    else if ($isApproachingActivated) array_push($runningStatus, 'machineRunningAlert');
+                                    else array_push($runningStatus, 'machineRunning');
+                                }
+                            }
+                        }
+                    }
                 }
             }
+
+            $device->status = $runningStatus;
 
             $downtime_by_reason = $this->getMachineDowntime($device->serial_number);
             $downtime_availability = $this->getMachineDowntimeAvailability($device->serial_number);
