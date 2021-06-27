@@ -832,9 +832,10 @@ class DeviceController extends Controller
                             else {
                                 if ($isActivePlcAlarm) array_push($runningStatus, 'machineRunningAlert');
                                 else {
-                                    if ($isThresholdActivated) array_push($runningStatus, 'machineRunningThreshold');
-                                    else if ($isApproachingActivated) array_push($runningStatus, 'machineRunningAlert');
-                                    else array_push($runningStatus, 'machineRunning');
+                                    if ($isThresholdActivated || $isApproachingActivated) {
+                                        if ($isThresholdActivated) array_push($runningStatus, 'machineRunningThreshold');
+                                        if ($isApproachingActivated) array_push($runningStatus, 'machineRunningAlert');
+                                    } else array_push($runningStatus, 'machineRunning');
                                 }
                             }
                         }
@@ -901,9 +902,10 @@ class DeviceController extends Controller
                             else {
                                 if ($isActivePlcAlarm) array_push($runningStatus, 'machineRunningAlert');
                                 else {
-                                    if ($isThresholdActivated) array_push($runningStatus, 'machineRunningThreshold');
-                                    else if ($isApproachingActivated) array_push($runningStatus, 'machineRunningAlert');
-                                    else array_push($runningStatus, 'machineRunning');
+                                    if ($isThresholdActivated || $isApproachingActivated) {
+                                        if ($isThresholdActivated) array_push($runningStatus, 'machineRunningThreshold');
+                                        if ($isApproachingActivated) array_push($runningStatus, 'machineRunningAlert');
+                                    } else array_push($runningStatus, 'machineRunning');
                                 }
                             }
                         }
@@ -970,9 +972,10 @@ class DeviceController extends Controller
                             else {
                                 if ($isActivePlcAlarm) array_push($runningStatus, 'machineRunningAlert');
                                 else {
-                                    if ($isThresholdActivated) array_push($runningStatus, 'machineRunningThreshold');
-                                    else if ($isApproachingActivated) array_push($runningStatus, 'machineRunningAlert');
-                                    else array_push($runningStatus, 'machineRunning');
+                                    if ($isThresholdActivated || $isApproachingActivated) {
+                                        if ($isThresholdActivated) array_push($runningStatus, 'machineRunningThreshold');
+                                        if ($isApproachingActivated) array_push($runningStatus, 'machineRunningAlert');
+                                    } else array_push($runningStatus, 'machineRunning');
                                 }
                             }
                         }

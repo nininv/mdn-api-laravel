@@ -584,9 +584,10 @@ class MachineController extends Controller
 						else {
 							if ($isActivePlcAlarm) array_push($product->status, 'machineRunningAlert');
 							else {
-								if ($isThresholdActivated) array_push($product->status, 'machineRunningThreshold');
-								else if ($isApproachingActivated) array_push($product->status, 'machineRunningAlert');
-								else array_push($product->status, 'machineRunning');
+								if ($isThresholdActivated || $isApproachingActivated) {
+									if ($isThresholdActivated) array_push($product->status, 'machineRunningThreshold');
+									if ($isApproachingActivated) array_push($product->status, 'machineRunningAlert');
+								} else array_push($product->status, 'machineRunning');
 							}
 						}
 					}
