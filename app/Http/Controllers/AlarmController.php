@@ -264,7 +264,7 @@ class AlarmController extends Controller
 		foreach ($active_alarms as $active_alarm) {
 			$active_alarm->machineName = Machine::where('id', $active_alarm->machine_id)->first()->name;
 			$active_alarm->alarmName = AlarmType::where('tag_id', $active_alarm->tag_id)->where('offset', $active_alarm->offset)->first()->name;
-			$active_alarm->deviceName = Device::where('serial_number', $active_alarm->device_id)->first()->name;
+			$active_alarm->deviceData = Device::where('serial_number', $active_alarm->device_id)->first();
 		}
 
 		$alarmsCount = count($active_alarms);
