@@ -103,8 +103,10 @@ class UserController extends Controller
                     return response()->json(false);
             }
             $user->role = $user->roles->first()->key;
-            $user->companyName = $user->company->name;
-            $user->phoneNumber = $user->profile->phone;
+            if (!$user->hasRole(['super_admin'])) {
+                $user->companyName = $user->company->name;
+                $user->phoneNumber = $user->profile->phone;
+            }
 
             return response()->json($user);
         } else {
