@@ -2920,92 +2920,14 @@ class MachineController extends Controller
 	 */
 	public function getAlarmsForLocation($location, $zone = 0) {
 		if (!$zone) {
-			$additional_query = "devices.location_id = $location";
+			$device_ids = Device::where('location_id', $location)->pluck('serial_number');
 		} else {
-			$additional_query = "devices.location_id = $location and devices.zone_id = $zone";
+			$device_ids = Device::where('location_id', $location)->where('zone_id', $zone)->pluck('serial_number');
 		}
 
-		$query = "select
-				sum(enriched_alarm_details.sensor_last_value)
-			from (
-				select
-					alarm_details.tag_id,
-					alarm_details.machine_id,
-					alarm_details.device_id,
-					alarm_details.latest_values_array,
-					alarm_details.bytes,
-					alarm_details.offset,
-					case
-					when alarm_details.bytes = 1 then
-						-- when bytes = 1 and values array length > 1 there is a wrong value in values data; do not mean it
-						case
-						when json_array_length(alarm_details.latest_values_array) > 1 then 0
-						else
-							case
-							when (trim(lower(alarm_details.latest_values_array ->> 0)) = 'true' or alarm_details.latest_values_array ->> 0 = '1') then 1
-							when (trim(lower(alarm_details.latest_values_array ->> 0)) = 'false' or alarm_details.latest_values_array ->> 0 = '0') then 0
-							-- when it is bigint value then cast it into binary, make right shift for offset value and then takes last digit from binary representaion of new value
-							else ((latest_values_array ->> 0)::bigint::bit(32) >> alarm_details.offset)::bigint::bit(1)::integer
-							end
-						end
-					when alarm_details.bytes = 0 then
-						case
-						when alarm_details.offset >= json_array_length(alarm_details.latest_values_array) then 0
-						else
-							case
-							when (trim(lower(alarm_details.latest_values_array ->> alarm_details.offset)) = 'true' or alarm_details.latest_values_array ->> alarm_details.offset = '1') then 1
-							when (trim(lower(alarm_details.latest_values_array ->> alarm_details.offset)) = 'false' or alarm_details.latest_values_array ->> alarm_details.offset = '0') then 0
-							else 1
-							end
-						end
-					else 0
-					end as sensor_last_value
-				from (
-					with
-					-- get devices set with filter by location_id
-					devices as (
-						select
-							devices.serial_number as serial_number,
-							devices.machine_id as machine_id
-						from devices
-						where
-							$additional_query
-					),
-					aggregated_alarms as (
-						select
-							tag_id,
-							devices.machine_id,
-							device_id,
-							(
-								select
-									latest_alarm.values
-								from alarms as latest_alarm
-								where
-									latest_alarm.device_id = alarms.device_id
-									and latest_alarm.tag_id = alarms.tag_id
-								order by latest_alarm.timestamp desc
-								limit 1
-							) as latest_values_array
-						from devices
-						join alarms on alarms.device_id = devices.serial_number::bigint
-							-- TODO: stub for incorrect data trouble bypassing; delete after improvements
-							and alarms.machine_id != 11
-						group by tag_id, devices.machine_id, device_id
-					)
-					select
-						aggregated_alarms.tag_id,
-						aggregated_alarms.machine_id,
-						aggregated_alarms.device_id,
-						aggregated_alarms.latest_values_array,
-						alarm_types.bytes,
-						alarm_types.offset
-					from aggregated_alarms
-					left join alarm_types on alarm_types.tag_id = aggregated_alarms.tag_id and alarm_types.machine_id = aggregated_alarms.machine_id
-				) as alarm_details
-			) as enriched_alarm_details";
+		$active_alarms = ActiveAlarms::whereIn('device_id', $device_ids)->get();
+		$alarmsCount = count($active_alarms);
 
-		$alarm_count = DB::select($query);
-		
-		return $alarm_count ? $alarm_count : 0;
+		return $alarmsCount;
 	}
 }
