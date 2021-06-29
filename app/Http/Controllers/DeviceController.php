@@ -33,10 +33,10 @@ use App\Threshold;
 use App\Imports\DevicesImport;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Pipeline\Pipeline;
+use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use GuzzleHttp\Client;
 use Validator;
-use DB;
 use \stdClass;
 
 class DeviceController extends Controller
@@ -1444,10 +1444,8 @@ class DeviceController extends Controller
                 ->select('downtimes.*', 'downtimes.device_id as serial_number', 'machines.name as machine_name',
                     'locations.name as location_name', 'downtime_type.name as downtime_type_name',
                     'zones.name as zone_name', 'downtime_reasons.name as downtime_reason', 'locations.id as location_id',
-                    'zones.id as zone_id', 'devices.machine_id as machine_id', 'devices.serial_number as device_serial_number',
-                    \Illuminate\Support\Facades\DB::raw('MIN(start_time) AS start_period'),\Illuminate\Support\Facades\DB::raw('MAX(end_time) AS end_period')
-                )->groupBy('downtimes.id', 'machines.name', 'locations.name', 'downtime_type.name', 'zones.name', 'downtime_reasons.name',
-                    'locations.id', 'zones.id', 'devices.machine_id', 'devices.serial_number'))
+                    'zones.id as zone_id', 'devices.machine_id as machine_id', 'devices.serial_number as device_serial_number'
+                ))
             ->through([
                 DowntimeFilter::class,
                 Sort::class,
@@ -1455,7 +1453,16 @@ class DeviceController extends Controller
             ])
             ->thenReturn();
 
-        $downtimes = new DownTimeTableDataResource($downtimes->paginate(request()->has('items') ? request('items') : 10));
+        $min_max = DB::table('downtimes')->whereIn('downtimes.device_id', $device_ids)
+            ->select(DB::raw('MIN(start_time) as start_value'),DB::raw('MAX(end_time) as end_value'))
+            ->first();
+
+        $downtimes = (new DownTimeTableDataResource($downtimes->paginate(request()->has('items') ? request('items') : 10)))->toArray($request);
+
+        $downtimes = array_merge($downtimes,[
+            'min_max' => $min_max
+        ]);
+
         return response()->json(compact('downtimes', 'downtimeTypes', 'locations', 'zones', 'reasons'));
     }
 
