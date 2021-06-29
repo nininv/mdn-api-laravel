@@ -33,10 +33,10 @@ use App\Threshold;
 use App\Imports\DevicesImport;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Pipeline\Pipeline;
+use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use GuzzleHttp\Client;
 use Validator;
-use DB;
 use \stdClass;
 
 class DeviceController extends Controller
@@ -1453,7 +1453,16 @@ class DeviceController extends Controller
             ])
             ->thenReturn();
 
-        $downtimes = new DownTimeTableDataResource($downtimes->paginate(request()->has('items') ? request('items') : 10));
+        $min_max = DB::table('downtimes')->whereIn('downtimes.device_id', $device_ids)
+            ->select(DB::raw('MIN(start_time) as start_value'),DB::raw('MAX(end_time) as end_value'))
+            ->first();
+
+        $downtimes = (new DownTimeTableDataResource($downtimes->paginate(request()->has('items') ? request('items') : 10)))->toArray($request);
+
+        $downtimes = array_merge($downtimes,[
+            'min_max' => $min_max
+        ]);
+
         return response()->json(compact('downtimes', 'downtimeTypes', 'locations', 'zones', 'reasons'));
     }
 
