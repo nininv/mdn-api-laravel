@@ -577,8 +577,8 @@ class MachineController extends Controller
 					array_push($product->status, 'plcNotConnected');
 				} else {
 					if (!$isRunning) {
-						array_push($product->status, 'machineStopped');
 						if ($isActivePlcAlarm) array_push($product->status, 'machineStoppedActiveAlarm');
+						else array_push($product->status, 'machineStopped');
 					} else {
 						if ($isIdle) array_push($product->status, 'machineIdle');
 						else {
@@ -586,7 +586,7 @@ class MachineController extends Controller
 							else {
 								if ($isThresholdActivated || $isApproachingActivated) {
 									if ($isThresholdActivated) array_push($product->status, 'machineRunningThreshold');
-									if ($isApproachingActivated) array_push($product->status, 'machineRunningAlert');
+									else array_push($product->status, 'machineRunningAlert');
 								} else array_push($product->status, 'machineRunning');
 							}
 						}
