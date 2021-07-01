@@ -7,6 +7,7 @@ use App\Threshold;
 use App\MachineTag;
 use App\AlarmType;
 use App\Device;
+use App\Machine;
 
 use \stdClass;
 
@@ -81,6 +82,7 @@ class ThresholdController extends Controller
 
         foreach ($conditions as $key => $condition) {
             $machine_id = Device::where('device_id', $condition['device_id'])->first()->machine_id;
+            $machine_name = Machine::where('id', $machine_id)->first()->name;
 
             $tag = MachineTag::where('configuration_id', $machine_id)->where('tag_id', $condition['tag_id'])->where('offset', $condition['offset'])->first();
 
@@ -89,6 +91,7 @@ class ThresholdController extends Controller
             }
 
             $condition['tag_name'] = $tag->name;
+            $condition['machine_name'] = $machine_name;
             $condition['option'] = $tag->name . " " . $this->getMathExpressionFromString($condition['operator']). " " . $condition['value'];
         }
 
@@ -147,6 +150,7 @@ class ThresholdController extends Controller
 
         foreach ($conditions as $key => $condition) {
             $device = Device::where('device_id', $condition['device_id'])->first();
+            $machine_name = Machine::where('id', $device->machine_id)->first()->name;
 
             $tag = MachineTag::where('configuration_id', $device->machine_id)->where('tag_id', $condition['tag_id'])->where('offset', $condition['offset'])->first();
 
@@ -156,11 +160,11 @@ class ThresholdController extends Controller
 
             $condition['tag_name'] = $tag->name;
             $condition['device_name'] = $device->name;
+            $condition['machine_name'] = $machine_name;
             $condition['option'] = $tag->name . " " . $this->getMathExpressionFromString($condition['operator']). " " . $condition['value'];
         }
 
         return response()->json(compact('conditions'));
-
     }
 
     public function getApproachingThresholds(Request $request) {
@@ -174,6 +178,7 @@ class ThresholdController extends Controller
 
         foreach ($conditions as $key => $condition) {
             $device = Device::where('device_id', $condition['device_id'])->first();
+            $machine_name = Machine::where('id', $device->machine_id)->first()->name;
 
             $tag = MachineTag::where('configuration_id', $device->machine_id)->where('tag_id', $condition['tag_id'])->where('offset', $condition['offset'])->first();
 
@@ -183,6 +188,7 @@ class ThresholdController extends Controller
 
             $condition['tag_name'] = $tag->name;
             $condition['device_name'] = $device->name;
+            $condition['machine_name'] = $machine_name;
             $condition['option'] = $tag->name . " " . $this->getMathExpressionFromString($condition['operator']). " " . $condition['approaching'];
         }
 
