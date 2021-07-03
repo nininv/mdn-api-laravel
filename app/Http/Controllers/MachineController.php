@@ -66,15 +66,14 @@ class MachineController extends Controller
     public function averagedSeries($collection, $series_count = 200, $devide_by = 1) {
     	$total = $collection->count();
 		$chunks = $collection->chunk($total / $series_count + 1);
-		$ret = [];
 
-		array_push($ret, $chunks->map(function($chunk) use ($devide_by) {
+		$ret = $chunks->map(function($chunk) use ($devide_by) {
 			$timestamp = ($chunk->first()->timestamp) * 1000;
 			$values = $chunk->map(function($value) use ($devide_by) {
 				return json_decode($value->values)[0] / $devide_by;
 			});
 			return [$timestamp, round(array_sum($values->all()) / $chunk->count(), 2)];
-		}));
+		});
 
 		return $ret;
     }
@@ -989,7 +988,7 @@ class MachineController extends Controller
 
 		$process_rate = $this->averagedSeries($process_rates_object);
 
-		$items = $process_rate;
+		$items = [$process_rate];
 		return response()->json(compact('items', 'isImperial'));
 	}
 
@@ -1041,25 +1040,9 @@ class MachineController extends Controller
 			$utilizations = $this->averagedSeries($utilizations_object, 200, 10);
 
 		}
-		$items = $utilizations;
-		if (count($items) != 0) {
-			$totalUtilization = array_sum(array_map(
-				function($item) {
-					return $item[1];
-				}, $items[0])
-			);
-			$averageUtilization = round($totalUtilization / count($items), 3);
-		} else {
-			$averageUtilization = 0;
-		}
+		$items = [$utilizations];
 
-		$averageSeries = [];
-
-		foreach ($items[0] as $utilization) {
-			array_push($averageSeries, [$utilization[0], $averageUtilization]);
-		}
-
-		return response()->json(compact('items', 'averageSeries'));
+		return response()->json(compact('items'));
 	}
 
 	/*
@@ -1086,7 +1069,7 @@ class MachineController extends Controller
 
 		$energy_consumption = $this->averagedSeries($energy_consumptions_object, 200, 10);
 
-		$items = $energy_consumption;
+		$items = [$energy_consumption];
 
 		return response()->json(compact('items'));
 	}
@@ -1203,7 +1186,7 @@ class MachineController extends Controller
 
 		$process_rate = $this->averagedSeries($process_rates_object);
 
-		$items = $process_rate;
+		$items = [$process_rate];
 
 		return response()->json(compact('items', 'isImperial'));
 	}
@@ -1370,7 +1353,7 @@ class MachineController extends Controller
 
 		$capabilities = $this->averagedSeries($capabilities_object);
 
-		$items = $capabilities;
+		$items = [$capabilities];
 
 		return response()->json(compact('items', 'isImperial'));
 	}
@@ -1400,7 +1383,7 @@ class MachineController extends Controller
 
 		$rates = $this->averagedSeries($rates_object);
 
-		$items = $rates;
+		$items = [$rates];
 
 		return response()->json(compact('items', 'isImperial'));
 	}
