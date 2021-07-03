@@ -1052,7 +1052,13 @@ class MachineController extends Controller
 			$averageUtilization = 0;
 		}
 
-		return response()->json(compact('items', 'averageUtilization'));
+		$averageSeries = [];
+
+		foreach ($utilizations as $utilization) {
+			array_push($averageSeries, [$utilization[0], $averageUtilization]);
+		}
+
+		return response()->json(compact('items', 'averageSeries'));
 	}
 
 	/*
