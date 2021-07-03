@@ -1041,8 +1041,18 @@ class MachineController extends Controller
 
 		}
 		$items = [$utilizations];
+		if (count($items)) {
+			$totalUtilization = array_sum(array_map(
+				function($item) {
+					return $item[1];
+				}, $items)
+			);
+			$averageUtilization = $totalUtilization / count($items);
+		} else {
+			$averageUtilization = 0;
+		}
 
-		return response()->json(compact('items'));
+		return response()->json(compact('items', 'averageUtilization'));
 	}
 
 	/*
