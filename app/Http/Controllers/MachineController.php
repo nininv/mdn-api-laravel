@@ -1041,13 +1041,13 @@ class MachineController extends Controller
 
 		}
 		$items = [$utilizations];
-		if (count($items)) {
+		if (count($items) != 0) {
 			$totalUtilization = array_sum(array_map(
 				function($item) {
 					return $item[1];
-				}, $items)
+				}, $utilizations)
 			);
-			$averageUtilization = $totalUtilization / count($items);
+			$averageUtilization = round($totalUtilization / count($items), 3);
 		} else {
 			$averageUtilization = 0;
 		}
