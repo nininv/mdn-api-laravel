@@ -1046,7 +1046,7 @@ class MachineController extends Controller
 			$totalUtilization = array_sum(array_map(
 				function($item) {
 					return $item[1];
-				}, $items)
+				}, $items[0])
 			);
 			$averageUtilization = round($totalUtilization / count($items), 3);
 		} else {
@@ -1055,7 +1055,7 @@ class MachineController extends Controller
 
 		$averageSeries = [];
 
-		foreach ($utilizations as $utilization) {
+		foreach ($items[0] as $utilization) {
 			array_push($averageSeries, [$utilization[0], $averageUtilization]);
 		}
 
