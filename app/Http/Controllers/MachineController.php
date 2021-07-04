@@ -1040,7 +1040,33 @@ class MachineController extends Controller
 			$utilizations = $this->averagedSeries($utilizations_object, 200, 10);
 
 		}
-		$items = [$utilizations];
+		$utilizationsSeries = new stdClass();
+		$averageSeries = new stdClass();
+		if (count($utilizations->toArray()) != 0) {
+			$totalUtilization = array_sum(array_map(
+				function($item) {
+					return $item[1];
+				}, $utilizations->toArray())
+			);
+			$averageUtilization = round($totalUtilization / count($utilizations->toArray()), 3);
+		} else {
+			$averageUtilization = 0;
+		}
+
+		$averageData = [];
+
+		foreach ($utilizations as $utilization) {
+			array_push($averageData, [$utilization[0], $averageUtilization]);
+		}
+
+		$utilizationsSeries->name = 'Utilization';
+		$utilizationsSeries->type = 'area';
+		$utilizationsSeries->data = $utilizations->toArray();
+		$averageSeries->name = 'Average Value';
+		$averageSeries->type = 'line';
+		$averageSeries->data = $averageData;
+
+		$items = [$utilizationsSeries, $averageSeries];
 
 		return response()->json(compact('items'));
 	}
