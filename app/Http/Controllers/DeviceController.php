@@ -808,7 +808,8 @@ class DeviceController extends Controller
                 $plcLinkStatus = false;
             }
 
-            $plcStatus = $this->getPlcStatus($device->device_id);
+            // $plcStatus = $this->getPlcStatus($device->device_id);
+            $plcStatus['status'] = 1;
             $isRunning = $this->isMachineRunning($device->serial_number, $device->machine_id);
             $isIdle = $this->isMachineIdle($device->serial_number, $device->machine_id);
             $isActivePlcAlarm = $this->isPlcAlarmActivated($device->serial_number, $device->machine_id);
@@ -878,7 +879,8 @@ class DeviceController extends Controller
                 $plcLinkStatus = false;
             }
 
-            $plcStatus = $this->getPlcStatus($device->device_id);
+            // $plcStatus = $this->getPlcStatus($device->device_id);
+            $plcStatus['status'] = 1;
             $isRunning = $this->isMachineRunning($device->serial_number, $device->machine_id);
             $isIdle = $this->isMachineIdle($device->serial_number, $device->machine_id);
             $isActivePlcAlarm = $this->isPlcAlarmActivated($device->serial_number, $device->machine_id);
@@ -948,7 +950,8 @@ class DeviceController extends Controller
                 $plcLinkStatus = false;
             }
 
-            $plcStatus = $this->getPlcStatus($device->device_id);
+            // $plcStatus = $this->getPlcStatus($device->device_id);
+            $plcStatus['status'] = 1;
             $isRunning = $this->isMachineRunning($device->serial_number, $device->machine_id);
             $isIdle = $this->isMachineIdle($device->serial_number, $device->machine_id);
             $isActivePlcAlarm = $this->isPlcAlarmActivated($device->serial_number, $device->machine_id);

@@ -561,7 +561,8 @@ class MachineController extends Controller
 			$plcLinkStatus = false;
 		}
 
-		$plcStatus = $this->getPlcStatus($product->teltonikaDevice->device_id);
+		// $plcStatus = $this->getPlcStatus($product->teltonikaDevice->device_id);
+		$plcStatue['status'] = 1;
 		$isRunning = $this->isMachineRunning($product->teltonikaDevice->serial_number, $product->teltonikaDevice->machine_id);
 		$isIdle = $this->isMachineIdle($product->teltonikaDevice->serial_number, $product->teltonikaDevice->machine_id);
 		$isActivePlcAlarm = $this->isPlcAlarmActivated($product->teltonikaDevice->serial_number, $product->teltonikaDevice->machine_id);
