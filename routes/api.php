@@ -66,7 +66,7 @@ Route::group(['prefix' => 'downtime-plans'], function () {
 });
 
 Route::apiResource('users', UserController::class)->only(['edit', 'update', 'index', 'store'])->middleware('auth');
-Route::post('users/delete', 'UserController@deleteUser');
+Route::post('users/delete', 'UserController@deleteUser')->middleware('auth');
 
 Route::group(['prefix' => 'app-settings'], function () {
 	Route::post('/grab-colors', 'SwatchController@grabColors');
@@ -128,7 +128,7 @@ Route::group(['prefix' => 'devices'], function () {
 });
 
 Route::group(['prefix' => 'machine-tags'], function () {
-	Route::get('/{id}', 'MachineTagController@getMachineTags');
+	Route::post('/', 'MachineTagController@getMachineTags');
 });
 
 Route::group(['prefix' => 'machines'], function () {

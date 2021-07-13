@@ -6,18 +6,29 @@ use Illuminate\Http\Request;
 use App\MachineTag;
 use App\AlarmType;
 use App\Device;
+use App\UserCustomizations;
 
 use \stdClass;
 
 class MachineTagController extends Controller
 {
-    public function getMachineTags($machine_id) {
-    	$tags = MachineTag::where('configuration_id', $machine_id)->orderBy('name')->get();
-    	$alarm_tags = AlarmType::where('machine_id', $machine_id)->orderBy('name')->get();
+    public function getMachineTags(Request $request) {
+		$user = $request->user('api');
+		$serialNumber = $request->serialNumber;
+		$user_customization = UserCustomizations::where('user_id', $user->id)->first();
+    	$tags = MachineTag::where('configuration_id', $request->machineId)->orderBy('name')->get();
+    	$alarm_tags = AlarmType::where('machine_id', $request->machineId)->orderBy('name')->get();
 
     	$tags = $tags->merge($alarm_tags);
 
-    	return response()->json(compact('tags'));
+		if ($user_customization) {
+			$option = json_decode($user_customization->customization);
+			$customization = $option->$serialNumber->selectedTags;
+		} else {
+			$customization = [];
+		}
+
+    	return response()->json(compact('tags', 'customization'));
     }
 
 	public function getMachinesTags(Request $request) {

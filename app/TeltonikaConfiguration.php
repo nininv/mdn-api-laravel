@@ -17,7 +17,9 @@ class TeltonikaConfiguration extends Model
         'tcu_type',
         'tcu_serial_number',
         'tcu_status',
-        'body'
+        'body',
+        'plc_update_time',
+        'tcu_update_time'
     ];
 
     public function device()
