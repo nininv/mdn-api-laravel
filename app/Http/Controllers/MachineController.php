@@ -35,6 +35,7 @@ use App\HopperClearedTime;
 use App\Idle;
 use App\ActiveAlarms;
 use App\Threshold;
+use App\UserCustomizations;
 use App\Exports\MachinesReportSheetExport;
 use App\Mail\RequestService;
 use GuzzleHttp\Client;
@@ -2444,10 +2445,32 @@ class MachineController extends Controller
 	}
 
 	public function getDataToolSeries(Request $request) {
+		$user = $request->user('api');
 		$series = [];
 		$tags = $request->selectedTags;
 		$from = $this->getFromTo($request->timeRange)["from"];
 		$to = $this->getFromTo($request->timeRange)["to"];
+
+		$user_customization = UserCustomizations::where('user_id', $user->id)->first();
+		if ($user_customization) {
+			$customization = json_decode($user_customization->customization);
+			$serialNumber = $request->serialNumber;
+			$customization->$serialNumber->selectedTags = $tags;
+
+			$user_customization->update([
+				'user_id' => $user->id,
+				'customization' => json_encode($customization)
+			]);
+		} else {
+			$options = new stdClass();
+			$serialNumber = $request->serialNumber;
+			$options->$serialNumber['selectedTags'] = $tags;
+
+			UserCustomizations::create([
+				'user_id' => $user->id,
+				'customization' => json_encode($options)
+			]);
+		}
 
 		foreach ($tags as $key => $tag) {
 			$series_obj = DeviceData::where('machine_id', $request->machineId)
