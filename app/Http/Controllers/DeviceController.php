@@ -802,42 +802,39 @@ class DeviceController extends Controller
         foreach ($devices as $key => $device) {
             $runningStatus = [];
 
-            if ($device->teltonikaConfiguration && $device->teltonikaConfiguration->plc_status) {
-                $plcLinkStatus = true;
+            if ($device->teltonikaConfiguration) {
+                $plcLinkStatus = $device->teltonikaConfiguration->plc_status ? true : false;
+                $plcStatus = $device->teltonikaConfiguration->router_status ? true : false;
             } else {
                 $plcLinkStatus = false;
+                $plcStatus = false;
             }
 
             // $plcStatus = $this->getPlcStatus($device->device_id);
-            $plcStatus['status'] = 1;
             $isRunning = $this->isMachineRunning($device->serial_number, $device->machine_id);
             $isIdle = $this->isMachineIdle($device->serial_number, $device->machine_id);
             $isActivePlcAlarm = $this->isPlcAlarmActivated($device->serial_number, $device->machine_id);
             $isThresholdActivated = $this->isThresholdsActivated($device->device_id, $device->machine_id, $user->id);
             $isApproachingActivated = $this->isApproachingActivated($device->device_id, $device->machine_id, $user->id);
 
-            if (!isset($plcStatus->status)) {
+            if (!$plcStatus) {
                 array_push($runningStatus, 'routerNotConnected');
             } else {
-                if ($plcStatus->status != 1) {
-                    array_push($runningStatus, 'routerNotConnected');
+                if (!$plcLinkStatus) {
+                    array_push($runningStatus, 'plcNotConnected');
                 } else {
-                    if (!$plcLinkStatus) {
-                        array_push($runningStatus, 'plcNotConnected');
+                    if (!$isRunning) {
+                        if ($isActivePlcAlarm) array_push($runningStatus, 'machineStoppedActiveAlarm');
+                        else array_push($runningStatus, 'machineStopped');
                     } else {
-                        if (!$isRunning) {
-                            if ($isActivePlcAlarm) array_push($runningStatus, 'machineStoppedActiveAlarm');
-                            else array_push($runningStatus, 'machineStopped');
-                        } else {
-                            if ($isIdle) array_push($runningStatus, 'machineIdle');
+                        if ($isIdle) array_push($runningStatus, 'machineIdle');
+                        else {
+                            if ($isActivePlcAlarm) array_push($runningStatus, 'machineRunningAlert');
                             else {
-                                if ($isActivePlcAlarm) array_push($runningStatus, 'machineRunningAlert');
-                                else {
-                                    if ($isThresholdActivated || $isApproachingActivated) {
-                                        if ($isThresholdActivated) array_push($runningStatus, 'machineRunningThreshold');
-                                        else array_push($runningStatus, 'machineRunningAlert');
-                                    } else array_push($runningStatus, 'machineRunning');
-                                }
+                                if ($isThresholdActivated || $isApproachingActivated) {
+                                    if ($isThresholdActivated) array_push($runningStatus, 'machineRunningThreshold');
+                                    else array_push($runningStatus, 'machineRunningAlert');
+                                } else array_push($runningStatus, 'machineRunning');
                             }
                         }
                     }
@@ -873,42 +870,39 @@ class DeviceController extends Controller
         foreach ($devices as $key => $device) {
             $runningStatus = [];
 
-            if ($device->teltonikaConfiguration && $device->teltonikaConfiguration->plc_status) {
-                $plcLinkStatus = true;
+            if ($device->teltonikaConfiguration) {
+                $plcLinkStatus = $device->teltonikaConfiguration->plc_status ? true : false;
+                $plcStatus = $device->teltonikaConfiguration->router_status ? true : false;
             } else {
                 $plcLinkStatus = false;
+                $plcStatus = false;
             }
 
             // $plcStatus = $this->getPlcStatus($device->device_id);
-            $plcStatus['status'] = 1;
             $isRunning = $this->isMachineRunning($device->serial_number, $device->machine_id);
             $isIdle = $this->isMachineIdle($device->serial_number, $device->machine_id);
             $isActivePlcAlarm = $this->isPlcAlarmActivated($device->serial_number, $device->machine_id);
             $isThresholdActivated = $this->isThresholdsActivated($device->device_id, $device->machine_id, $user->id);
             $isApproachingActivated = $this->isApproachingActivated($device->device_id, $device->machine_id, $user->id);
 
-            if (!isset($plcStatus->status)) {
+            if (!$plcStatus) {
                 array_push($runningStatus, 'routerNotConnected');
             } else {
-                if ($plcStatus->status != 1) {
-                    array_push($runningStatus, 'routerNotConnected');
+                if (!$plcLinkStatus) {
+                    array_push($runningStatus, 'plcNotConnected');
                 } else {
-                    if (!$plcLinkStatus) {
-                        array_push($runningStatus, 'plcNotConnected');
+                    if (!$isRunning) {
+                        if ($isActivePlcAlarm) array_push($runningStatus, 'machineStoppedActiveAlarm');
+                        else array_push($runningStatus, 'machineStopped');
                     } else {
-                        if (!$isRunning) {
-                            if ($isActivePlcAlarm) array_push($runningStatus, 'machineStoppedActiveAlarm');
-                            else array_push($runningStatus, 'machineStopped');
-                        } else {
-                            if ($isIdle) array_push($runningStatus, 'machineIdle');
+                        if ($isIdle) array_push($runningStatus, 'machineIdle');
+                        else {
+                            if ($isActivePlcAlarm) array_push($runningStatus, 'machineRunningAlert');
                             else {
-                                if ($isActivePlcAlarm) array_push($runningStatus, 'machineRunningAlert');
-                                else {
-                                    if ($isThresholdActivated || $isApproachingActivated) {
-                                        if ($isThresholdActivated) array_push($runningStatus, 'machineRunningThreshold');
-                                        else array_push($runningStatus, 'machineRunningAlert');
-                                    } else array_push($runningStatus, 'machineRunning');
-                                }
+                                if ($isThresholdActivated || $isApproachingActivated) {
+                                    if ($isThresholdActivated) array_push($runningStatus, 'machineRunningThreshold');
+                                    else array_push($runningStatus, 'machineRunningAlert');
+                                } else array_push($runningStatus, 'machineRunning');
                             }
                         }
                     }
@@ -944,42 +938,39 @@ class DeviceController extends Controller
         foreach ($devices as $key => $device) {
             $runningStatus = [];
 
-            if ($device->teltonikaConfiguration && $device->teltonikaConfiguration->plc_status) {
-                $plcLinkStatus = true;
+            if ($device->teltonikaConfiguration) {
+                $plcLinkStatus = $device->teltonikaConfiguration->plc_status ? true : false;
+                $plcStatus = $device->teltonikaConfiguration->router_status ? true : false;
             } else {
                 $plcLinkStatus = false;
+                $plcStatus = false;
             }
 
             // $plcStatus = $this->getPlcStatus($device->device_id);
-            $plcStatus['status'] = 1;
             $isRunning = $this->isMachineRunning($device->serial_number, $device->machine_id);
             $isIdle = $this->isMachineIdle($device->serial_number, $device->machine_id);
             $isActivePlcAlarm = $this->isPlcAlarmActivated($device->serial_number, $device->machine_id);
             $isThresholdActivated = $this->isThresholdsActivated($device->device_id, $device->machine_id, $user->id);
             $isApproachingActivated = $this->isApproachingActivated($device->device_id, $device->machine_id, $user->id);
 
-            if (!isset($plcStatus->status)) {
+            if (!$plcStatus) {
                 array_push($runningStatus, 'routerNotConnected');
             } else {
-                if ($plcStatus->status != 1) {
-                    array_push($runningStatus, 'routerNotConnected');
+                if (!$plcLinkStatus) {
+                    array_push($runningStatus, 'plcNotConnected');
                 } else {
-                    if (!$plcLinkStatus) {
-                        array_push($runningStatus, 'plcNotConnected');
+                    if (!$isRunning) {
+                        if ($isActivePlcAlarm) array_push($runningStatus, 'machineStoppedActiveAlarm');
+                        else array_push($runningStatus, 'machineStopped');
                     } else {
-                        if (!$isRunning) {
-                            if ($isActivePlcAlarm) array_push($runningStatus, 'machineStoppedActiveAlarm');
-                            else array_push($runningStatus, 'machineStopped');
-                        } else {
-                            if ($isIdle) array_push($runningStatus, 'machineIdle');
+                        if ($isIdle) array_push($runningStatus, 'machineIdle');
+                        else {
+                            if ($isActivePlcAlarm) array_push($runningStatus, 'machineRunningAlert');
                             else {
-                                if ($isActivePlcAlarm) array_push($runningStatus, 'machineRunningAlert');
-                                else {
-                                    if ($isThresholdActivated || $isApproachingActivated) {
-                                        if ($isThresholdActivated) array_push($runningStatus, 'machineRunningThreshold');
-                                        else array_push($runningStatus, 'machineRunningAlert');
-                                    } else array_push($runningStatus, 'machineRunning');
-                                }
+                                if ($isThresholdActivated || $isApproachingActivated) {
+                                    if ($isThresholdActivated) array_push($runningStatus, 'machineRunningThreshold');
+                                    else array_push($runningStatus, 'machineRunningAlert');
+                                } else array_push($runningStatus, 'machineRunning');
                             }
                         }
                     }

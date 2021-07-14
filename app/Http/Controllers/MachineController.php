@@ -568,36 +568,31 @@ class MachineController extends Controller
 		}
 
 		if ($configuration && isset($product->teltonikaDevice)) {
-			// $plcStatus = $this->getPlcStatus($product->teltonikaDevice->device_id);
-			$plcStatue['status'] = 1;
+			$plcStatus = $configuration->router_status;
 			$isRunning = $this->isMachineRunning($product->teltonikaDevice->serial_number, $product->teltonikaDevice->machine_id);
 			$isIdle = $this->isMachineIdle($product->teltonikaDevice->serial_number, $product->teltonikaDevice->machine_id);
 			$isActivePlcAlarm = $this->isPlcAlarmActivated($product->teltonikaDevice->serial_number, $product->teltonikaDevice->machine_id);
 			$isThresholdActivated = $this->isThresholdsActivated($product->teltonikaDevice->device_id, $product->teltonikaDevice->machine_id, $user->id);
 			$isApproachingActivated = $this->isApproachingActivated($product->teltonikaDevice->device_id, $product->teltonikaDevice->machine_id, $user->id);
 
-			if (!isset($plcStatus->status)) {
+			if (!$plcStatus) {
 				array_push($product->status, 'routerNotConnected');
 			} else {
-				if ($plcStatus->status != 1) {
-					array_push($product->status, 'routerNotConnected');
+				if (!$plcLinkStatus) {
+					array_push($product->status, 'plcNotConnected');
 				} else {
-					if (!$plcLinkStatus) {
-						array_push($product->status, 'plcNotConnected');
+					if (!$isRunning) {
+						if ($isActivePlcAlarm) array_push($product->status, 'machineStoppedActiveAlarm');
+						else array_push($product->status, 'machineStopped');
 					} else {
-						if (!$isRunning) {
-							if ($isActivePlcAlarm) array_push($product->status, 'machineStoppedActiveAlarm');
-							else array_push($product->status, 'machineStopped');
-						} else {
-							if ($isIdle) array_push($product->status, 'machineIdle');
+						if ($isIdle) array_push($product->status, 'machineIdle');
+						else {
+							if ($isActivePlcAlarm) array_push($product->status, 'machineRunningAlert');
 							else {
-								if ($isActivePlcAlarm) array_push($product->status, 'machineRunningAlert');
-								else {
-									if ($isThresholdActivated || $isApproachingActivated) {
-										if ($isThresholdActivated) array_push($product->status, 'machineRunningThreshold');
-										else array_push($product->status, 'machineRunningAlert');
-									} else array_push($product->status, 'machineRunning');
-								}
+								if ($isThresholdActivated || $isApproachingActivated) {
+									if ($isThresholdActivated) array_push($product->status, 'machineRunningThreshold');
+									else array_push($product->status, 'machineRunningAlert');
+								} else array_push($product->status, 'machineRunning');
 							}
 						}
 					}
