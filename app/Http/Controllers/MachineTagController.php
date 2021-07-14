@@ -23,7 +23,11 @@ class MachineTagController extends Controller
 
 		if ($user_customization) {
 			$option = json_decode($user_customization->customization);
-			$customization = $option->$serialNumber->selectedTags;
+			if (isset($option->$serialNumber)) {
+				$customization = $option->$serialNumber->selectedTags;
+			} else {
+				$customization = [];
+			}
 		} else {
 			$customization = [];
 		}
