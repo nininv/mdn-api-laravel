@@ -162,6 +162,8 @@ class MachineController extends Controller
 
             return false;
         }
+
+		return false;
     }
 
     public function isPlcAlarmActivated($deviceId, $machineId)
@@ -550,8 +552,12 @@ class MachineController extends Controller
 			}
 		}
 
-		$saved_machine = SavedMachine::where('user_id', $user->id)
-									->where('device_id', $product->teltonikaDevice->id)->first();
+		if (isset($product->teltonikaDevice)) {
+			$saved_machine = SavedMachine::where('user_id', $user->id)
+							->where('device_id', $product->teltonikaDevice->id)->first();
+		} else {
+			$saved_machine = false;
+		}
 
 		$product->status = [];
 
@@ -561,40 +567,61 @@ class MachineController extends Controller
 			$plcLinkStatus = false;
 		}
 
-		// $plcStatus = $this->getPlcStatus($product->teltonikaDevice->device_id);
-		$plcStatue['status'] = 1;
-		$isRunning = $this->isMachineRunning($product->teltonikaDevice->serial_number, $product->teltonikaDevice->machine_id);
-		$isIdle = $this->isMachineIdle($product->teltonikaDevice->serial_number, $product->teltonikaDevice->machine_id);
-		$isActivePlcAlarm = $this->isPlcAlarmActivated($product->teltonikaDevice->serial_number, $product->teltonikaDevice->machine_id);
-		$isThresholdActivated = $this->isThresholdsActivated($product->teltonikaDevice->device_id, $product->teltonikaDevice->machine_id, $user->id);
-		$isApproachingActivated = $this->isApproachingActivated($product->teltonikaDevice->device_id, $product->teltonikaDevice->machine_id, $user->id);
+		if ($configuration && isset($product->teltonikaDevice)) {
+			// $plcStatus = $this->getPlcStatus($product->teltonikaDevice->device_id);
+			$plcStatue['status'] = 1;
+			$isRunning = $this->isMachineRunning($product->teltonikaDevice->serial_number, $product->teltonikaDevice->machine_id);
+			$isIdle = $this->isMachineIdle($product->teltonikaDevice->serial_number, $product->teltonikaDevice->machine_id);
+			$isActivePlcAlarm = $this->isPlcAlarmActivated($product->teltonikaDevice->serial_number, $product->teltonikaDevice->machine_id);
+			$isThresholdActivated = $this->isThresholdsActivated($product->teltonikaDevice->device_id, $product->teltonikaDevice->machine_id, $user->id);
+			$isApproachingActivated = $this->isApproachingActivated($product->teltonikaDevice->device_id, $product->teltonikaDevice->machine_id, $user->id);
 
-		if (!isset($plcStatus->status)) {
-			array_push($product->status, 'routerNotConnected');
-		} else {
-			if ($plcStatus->status != 1) {
+			if (!isset($plcStatus->status)) {
 				array_push($product->status, 'routerNotConnected');
 			} else {
-				if (!$plcLinkStatus) {
-					array_push($product->status, 'plcNotConnected');
+				if ($plcStatus->status != 1) {
+					array_push($product->status, 'routerNotConnected');
 				} else {
-					if (!$isRunning) {
-						if ($isActivePlcAlarm) array_push($product->status, 'machineStoppedActiveAlarm');
-						else array_push($product->status, 'machineStopped');
+					if (!$plcLinkStatus) {
+						array_push($product->status, 'plcNotConnected');
 					} else {
-						if ($isIdle) array_push($product->status, 'machineIdle');
-						else {
-							if ($isActivePlcAlarm) array_push($product->status, 'machineRunningAlert');
+						if (!$isRunning) {
+							if ($isActivePlcAlarm) array_push($product->status, 'machineStoppedActiveAlarm');
+							else array_push($product->status, 'machineStopped');
+						} else {
+							if ($isIdle) array_push($product->status, 'machineIdle');
 							else {
-								if ($isThresholdActivated || $isApproachingActivated) {
-									if ($isThresholdActivated) array_push($product->status, 'machineRunningThreshold');
-									else array_push($product->status, 'machineRunningAlert');
-								} else array_push($product->status, 'machineRunning');
+								if ($isActivePlcAlarm) array_push($product->status, 'machineRunningAlert');
+								else {
+									if ($isThresholdActivated || $isApproachingActivated) {
+										if ($isThresholdActivated) array_push($product->status, 'machineRunningThreshold');
+										else array_push($product->status, 'machineRunningAlert');
+									} else array_push($product->status, 'machineRunning');
+								}
 							}
 						}
 					}
 				}
 			}
+		} else if ($request->machineId == 11 && !$configuration) {
+			$tcuRunning = DeviceData::where('serial_number', $request->serialNumber)
+				->where('machine_id', 11)
+				->where('tag_id', 40)
+				->latest('timestamp')
+				->first();
+
+			if ($tcuRunning) {
+				$tcuRunningStatus = json_decode($tcuRunning->values)[0];
+				array_push($product->status, $tcuRunningStatus ? 'machineRunning' : 'machineStopped');
+			} else {
+				array_push($product->status, 'machineStopped');
+			}
+
+			$product->teltonikaDevice['customer_assigned_name'] = 'TrueTemp TCU';
+			$product->teltonikaDevice['name'] = 'TrueTemp TCU';
+			$product->teltonikaDevice['id'] = 0;
+		} else {
+			array_push($product->status, 'routerNotConnected');
 		}
 
 		if (!$saved_machine) {
