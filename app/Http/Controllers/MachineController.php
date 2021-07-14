@@ -2456,7 +2456,11 @@ class MachineController extends Controller
 		if ($user_customization) {
 			$customization = json_decode($user_customization->customization);
 			$serialNumber = $request->serialNumber;
-			$customization->$serialNumber->selectedTags = $tags;
+			if (isset($customization->$serialNumber)) {
+				$customization->$serialNumber->selectedTags = $tags;
+			} else {
+				$customization->$serialNumber['selectedTags'] = $tags;
+			}
 
 			$user_customization->update([
 				'user_id' => $user->id,
