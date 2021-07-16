@@ -30,6 +30,7 @@ use App\Timezone;
 use App\Idle;
 use App\ActiveAlarms;
 use App\Threshold;
+use App\UserCustomizations;
 use App\Imports\DevicesImport;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Pipeline\Pipeline;
@@ -1886,6 +1887,66 @@ class DeviceController extends Controller
         $items = [$utilizations];
 
         return $items;
+    }
+    
+    // update machines table default header option
+    public function setMachinesTableDefaultHeader(Request $request)
+    {
+        $user = $request->user('api');
+        $path_name = $request->name;
+        $headers = $request['headers'];
+        $user_customization = UserCustomizations::where('user_id', $user->id)->first();
+
+        if ($user_customization) {
+            $customization = json_decode($user_customization->customization);
+            $customization->companyMachinesTableHeader = $headers;
+
+            $user_customization->update([
+				'user_id' => $user->id,
+				'customization' => json_encode($customization)
+			]);
+        } else {
+            $options = new stdClass();
+            $options->companyMachinesTableHeader = $headers;
+
+            UserCustomizations::create([
+				'user_id' => $user->id,
+				'customization' => json_encode($options)
+			]);
+        }
+
+        return response()->json(['User state has been updated.']);
+    }
+
+    // Get machines table headers for user
+    public function getMachinesTableHeaders(Request $request)
+    {
+        $user = $request->user('api');
+        $customization = UserCustomizations::where('user_id', $user->id)->first();
+        $headerOption = $this->getMachinesTableKeyName($request->name);
+
+        if ($customization) {
+            $option = json_decode($customization->customization);
+            if (isset($option->$headerOption)) {
+                $headers = $option->$headerOption;
+            } else {
+                $headers = null;
+            }
+        } else {
+            $headers = null;
+        }
+
+        return response()->json(compact('headers'));
+    }
+
+    // Get customization option name
+    public function getMachinesTableKeyName($name)
+    {
+        switch ($name) {
+            case 'dashboard-analytics':
+                return 'companyMachinesTableHeader';
+                break;
+        }
     }
 
     public function averagedSeries($collection, $series_count = 200, $devide_by = 1)
