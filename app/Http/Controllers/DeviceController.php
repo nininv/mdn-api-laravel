@@ -981,9 +981,9 @@ class DeviceController extends Controller
             $device->status = $runningStatus;
 
             $downtime_by_reason = $this->getMachineDowntime($device->serial_number);
-            $downtime_availability = $this->getMachineDowntimeAvailability($device->serial_number);
+            $capacity_utilization = $this->getCapacityUtilizationForMachine($device->serial_number, $device->machine_id);
+            $device->capacityUtilization = $capacity_utilization;
             $device->downtimeByReason = $downtime_by_reason;
-            $device->downtimeAvailability = $downtime_availability;
         }
 
         return response()->json(compact('devices'));
@@ -1949,6 +1949,9 @@ class DeviceController extends Controller
                 break;
             case 'location-dashboard':
                 return 'locationMachinesTableHeader';
+                break;
+            case 'zone-dashboard':
+                return 'zoneMachinesTableHeader';
                 break;
         }
     }
