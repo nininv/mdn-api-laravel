@@ -1896,10 +1896,11 @@ class DeviceController extends Controller
         $path_name = $request->name;
         $headers = $request['headers'];
         $user_customization = UserCustomizations::where('user_id', $user->id)->first();
+        $headerOption = $this->getMachinesTableKeyName($request->name);
 
         if ($user_customization) {
             $customization = json_decode($user_customization->customization);
-            $customization->companyMachinesTableHeader = $headers;
+            $customization->$headerOption = $headers;
 
             $user_customization->update([
 				'user_id' => $user->id,
@@ -1907,7 +1908,7 @@ class DeviceController extends Controller
 			]);
         } else {
             $options = new stdClass();
-            $options->companyMachinesTableHeader = $headers;
+            $options->$headerOption = $headers;
 
             UserCustomizations::create([
 				'user_id' => $user->id,
@@ -1945,6 +1946,9 @@ class DeviceController extends Controller
         switch ($name) {
             case 'dashboard-analytics':
                 return 'companyMachinesTableHeader';
+                break;
+            case 'location-dashboard':
+                return 'locationMachinesTableHeader';
                 break;
         }
     }
