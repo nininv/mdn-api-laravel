@@ -1311,7 +1311,7 @@ class MachineController extends Controller
 						->first()) {
 				try {
 					$machine_states->pump_status = json_decode($pump_status_object->values)[0];
-				} catch(Exception $e) {
+				} catch(\Exception $e) {
 					$machine_states->pump_status = 0;
 				}
 			}
@@ -1322,7 +1322,7 @@ class MachineController extends Controller
 				->first()) {
 				try {
 					$machine_states->heater_status = json_decode($heater_status_object->values)[0];
-				} catch(Exception $e) {
+				} catch(\Exception $e) {
 					$machine_states->heater_status = 0;
 				}
 			}
@@ -1333,7 +1333,7 @@ class MachineController extends Controller
 				->first()) {
 				try {
 					$machine_states->vent_status = json_decode($vent_status_object->values)[0];
-				} catch(Exception $e) {
+				} catch(\Exception $e) {
 					$machine_states->vent_status = 0;
 				}
 			}
@@ -2668,9 +2668,9 @@ class MachineController extends Controller
 					output_dates as (
 						select generate_series(
 							date_trunc('day', to_timestamp(input_params.start_datetime)),
-							case when 
-								extract(hour from to_timestamp(input_params.end_datetime)) = 0 
-								and extract(minute from to_timestamp(input_params.end_datetime)) = 0 
+							case when
+								extract(hour from to_timestamp(input_params.end_datetime)) = 0
+								and extract(minute from to_timestamp(input_params.end_datetime)) = 0
 								and extract(second from to_timestamp(input_params.end_datetime)) = 0
 							then
 								date_trunc('day', to_timestamp(input_params.end_datetime - datetime_config.day_duration))
@@ -2686,23 +2686,23 @@ class MachineController extends Controller
 							extract(epoch from generated_date) as date
 						from output_dates
 					)
-					
+
 					select
 						output_dates_int.date as output_date_int,
 						downtime_reasons.name as reason_name,
-					
+
 						case when downtimes.start_time is not null then
 							greatest(input_params.start_datetime, output_dates_int.date, downtimes.start_time)
 						else
 							null
 						end as corrected_downtime_start_int,
-					
+
 						case when downtimes.start_time is not null then
 							least(input_params.end_datetime, output_dates_int.date + datetime_config.day_duration, downtimes.end_time)
 						else
 							null
 						end as corrected_downtime_end_int
-					
+
 					from input_params
 					left join output_dates_int on 0 = 0
 					left join downtime_reasons on 0 = 0
@@ -2712,7 +2712,7 @@ class MachineController extends Controller
 						and downtimes.end_time >= greatest(output_dates_int.date, input_params.start_datetime)
 						$additional_query
 					order by output_dates_int.date, downtime_reasons.name, downtimes.start_time
-					
+
 				) as detailed_subquery
 				group by detailed_subquery.reason_name, detailed_subquery.output_date_int
 			) as overall_subquery
@@ -2729,7 +2729,7 @@ class MachineController extends Controller
 
 	/**
 	 * Get downtime availability in the time period
-	 * 
+	 *
 	 * @param $location integer
 	 * @param $zone 	integer
 	 * @param $start	timestamp
@@ -2777,9 +2777,9 @@ class MachineController extends Controller
                     output_dates as (
                         select generate_series(
                             date_trunc('day', to_timestamp(input_params.start_datetime)),
-                            case when 
-                                extract(hour from to_timestamp(input_params.end_datetime)) = 0 
-                                and extract(minute from to_timestamp(input_params.end_datetime)) = 0 
+                            case when
+                                extract(hour from to_timestamp(input_params.end_datetime)) = 0
+                                and extract(minute from to_timestamp(input_params.end_datetime)) = 0
                                 and extract(second from to_timestamp(input_params.end_datetime)) = 0
                             then
                                 date_trunc('day', to_timestamp(input_params.end_datetime - datetime_config.day_duration))
@@ -2795,23 +2795,23 @@ class MachineController extends Controller
                             extract(epoch from generated_date) as date
                         from output_dates
                     )
-                    
+
                     select
                         output_dates_int.date as output_date_int,
                         downtime_reasons.name as reason_name,
-                    
+
                         case when downtimes.start_time is not null then
                             greatest(input_params.start_datetime, output_dates_int.date, downtimes.start_time)
                         else
                             null
                         end as corrected_downtime_start_int,
-                    
+
                         case when downtimes.start_time is not null then
                             least(input_params.end_datetime, output_dates_int.date + datetime_config.day_duration, downtimes.end_time)
                         else
                             null
                         end as corrected_downtime_end_int
-                    
+
                     from input_params
                     left join output_dates_int on 0 = 0
                     left join downtime_reasons on 0 = 0
@@ -2821,10 +2821,10 @@ class MachineController extends Controller
                         and downtimes.end_time >= greatest(output_dates_int.date, input_params.start_datetime)
                         $additional_query
                     order by output_dates_int.date, downtime_reasons.name, downtimes.start_time
-                    
+
                 ) as detailed_subquery
                 group by detailed_subquery.reason_name, detailed_subquery.output_date_int
-                
+
             ) as aggregated_subquery
             group by aggregated_subquery.reason_name";
 
@@ -2990,7 +2990,7 @@ class MachineController extends Controller
 
 	/**
 	 * Get number of alarms
-	 * 
+	 *
 	 * @param $location		integer
 	 * @param $zone 		integer
 	 */

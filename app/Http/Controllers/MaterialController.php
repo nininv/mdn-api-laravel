@@ -269,7 +269,7 @@ class MaterialController extends Controller
         $user = $request->user('api');
         $company = $user->company;
         $devices_serial_numbers = $company->devices->where('location_id', $request->location)->pluck('serial_number');
-        $teltonika_ids = TeltonikaConfiguration::whereIn('teltonika_id', $devices_serial_numbers)->get()->pluck('plc_serial_number');
+        $teltonika_ids = TeltonikaConfiguration::whereIn('teltonika_id', $devices_serial_numbers)->pluck('plc_serial_number');
         $inventory_materials = $company->inventoryMaterials->whereIn('plc_id', $teltonika_ids);
 
         $material_keys = InventoryMaterial::MATERIAL_KEYS_ARRAY;

@@ -29,7 +29,7 @@ class CompanyController extends Controller
 
     public function addCustomer(Request $request)
 	{
-	    $validator = Validator::make($request->all(), [ 
+	    $validator = Validator::make($request->all(), [
 	        'company_name' => 'required',
 	        'administrator_name' => 'required',
 	        'administrator_email' => 'required|email|max:255|unique:users,email',
@@ -43,7 +43,7 @@ class CompanyController extends Controller
 
 	    if ($validator->fails())
 	    {
-            return response()->json(['error'=>$validator->errors()], 422);            
+            return response()->json(['error'=>$validator->errors()], 422);
         }
 
         $company = Company::where('name', $request->company_name)->first();
@@ -55,7 +55,7 @@ class CompanyController extends Controller
 
 		$password_string = md5(uniqid($request->email, true));
 		// $password_string = 'password';
-		
+
         $user = User::create([
             'name' => $request->administrator_name,
             'email' => $request->administrator_email,
@@ -85,7 +85,7 @@ class CompanyController extends Controller
 		$customer->companyName = $customer->company->name;
 		$profile = $customer->profile;
 		$cities = City::where('state', $profile->state)->orderBy('city')->get();
-		
+
 		return response()->json(compact('customer', 'profile', 'cities'));
 	}
 
@@ -94,7 +94,7 @@ class CompanyController extends Controller
         $customer = User::findOrFail($id);
 		$company = $customer->company;
 
-		$validator = Validator::make($request->all(), [ 
+		$validator = Validator::make($request->all(), [
 	        'name' => 'required',
 	        'administrator_name' => 'required',
 	        'administrator_email' => 'required|email|max:255|unique:users,email,' . $customer->id
@@ -102,7 +102,7 @@ class CompanyController extends Controller
 
 	    if ($validator->fails())
 	    {
-            return response()->json(['error'=>$validator->errors()], 422);            
+            return response()->json(['error'=>$validator->errors()], 422);
         }
 
         $company->name = $request->name;
@@ -128,7 +128,7 @@ class CompanyController extends Controller
 
 	    if ($validator->fails())
 	    {
-            return response()->json(['error'=>$validator->errors()], 422);            
+            return response()->json(['error'=>$validator->errors()], 422);
         }
 
         $profile = User::findOrFail($id)->profile;
@@ -149,8 +149,6 @@ class CompanyController extends Controller
 	{
 		$customer_admin_role = Role::findOrFail(ROLE_CUSTOMER_ADMIN);
 		$customer_admins = $customer_admin_role->users;
-
-		$companies = Company::select('id', 'name', 'created_at')->get();
 
 		foreach ($customer_admins as $customer_admin) {
 			$customer_admin->companyName = $customer_admin->company->name;

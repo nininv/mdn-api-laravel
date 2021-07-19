@@ -100,7 +100,7 @@ class Device extends Model
     public function scopeWhereVisibleOnly($query)
     {
         if ((new Setting())->getTypeVisibleValue() === 'configured') {
-            $query->whereIn('serial_number', DeviceConfiguration::all()->pluck('teltonika_id'));
+            $query->whereIn('serial_number', DeviceConfiguration::pluck('teltonika_id'));
         }
 
         return $query;
