@@ -911,7 +911,7 @@ class DeviceController extends Controller
             }
 
             $device->status = $runningStatus;
-            $device->downtime_by_reason = $this->getDowntimeByReasonForMachine($device->serial_number);
+            $device->downtimeByReason = $this->getDowntimeByReasonForMachine($device->serial_number);
             $capacity_utilization = $this->getCapacityUtilizationForMachine($device->serial_number, $device->machine_id);
             $device->capacityUtilization = $capacity_utilization;
         }
