@@ -911,7 +911,7 @@ class DeviceController extends Controller
             }
 
             $device->status = $runningStatus;
-
+            $device->downtimeByReason = $this->getDowntimeByReasonForMachine($device->serial_number);
             $capacity_utilization = $this->getCapacityUtilizationForMachine($device->serial_number, $device->machine_id);
             $device->capacityUtilization = $capacity_utilization;
         }
@@ -1888,7 +1888,7 @@ class DeviceController extends Controller
 
         return $items;
     }
-    
+
     // update machines table default header option
     public function setMachinesTableDefaultHeader(Request $request)
     {
