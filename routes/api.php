@@ -128,6 +128,8 @@ Route::group(['prefix' => 'devices'], function () {
 
 	Route::post('/set-machines-table-default-headers', 'DeviceController@setMachinesTableDefaultHeader')->middleware('auth');
 	Route::post('/get-machines-table-headers', 'DeviceController@getMachinesTableHeaders')->middleware('auth');
+	Route::post('/set-saved-machines-table-default-headers', 'DeviceController@setSavedMachinesTableDefaultHeader')->middleware('auth');
+	Route::post('/get-saved-machines-table-headers', 'DeviceController@getSavedMachinesTableHeaders')->middleware('auth');
 });
 
 Route::group(['prefix' => 'machine-tags'], function () {
