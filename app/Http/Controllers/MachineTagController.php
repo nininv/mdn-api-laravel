@@ -7,6 +7,7 @@ use App\MachineTag;
 use App\AlarmType;
 use App\Device;
 use App\UserCustomizations;
+use App\DefaultCustomization;
 
 use \stdClass;
 
@@ -18,6 +19,7 @@ class MachineTagController extends Controller
 		$user_customization = UserCustomizations::where('user_id', $user->id)->first();
     	$tags = MachineTag::where('configuration_id', $request->machineId)->orderBy('name')->get();
     	$alarm_tags = AlarmType::where('machine_id', $request->machineId)->orderBy('name')->get();
+		$default_setting = DefaultCustomization::where('machine_id', $request->machineId)->first();
 
     	$tags = $tags->merge($alarm_tags);
 
@@ -25,9 +27,13 @@ class MachineTagController extends Controller
 			$option = json_decode($user_customization->customization);
 			if (isset($option->$serialNumber)) {
 				$customization = $option->$serialNumber->selectedTags;
+			} else if ($default_setting) {
+				$customization = json_decode($default_setting->customization);
 			} else {
 				$customization = [];
 			}
+		} else if ($default_setting) {
+			$customization = json_decode($default_setting->customization);
 		} else {
 			$customization = [];
 		}
