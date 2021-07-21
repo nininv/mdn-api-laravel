@@ -2964,8 +2964,8 @@ class MachineController extends Controller
 				];
 			case 'custom':
 				return [
-					"from" => strtotime($data["dates"]['0']),
-					"to" => strtotime($data["dates"]['1'])
+					"from" => strtotime($data['dateFrom'] . '00:00:00'),
+					"to" => strtotime($data['dateTo'] . '23:59:59')
 				];
 				break;
 			default:
