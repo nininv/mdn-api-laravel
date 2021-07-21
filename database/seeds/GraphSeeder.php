@@ -36,6 +36,14 @@ class GraphSeeder extends Seeder
                 'graph_name' => 'Recipe'
             ], [
                 'machine_id' => 1,
+                'graph_id' => 20,
+                'graph_name' => 'Downtime History'
+            ], [
+                'machine_id' => 1,
+                'graph_id' => 21,
+                'graph_name' => 'Downtime By Type(Reason)'
+            ], [
+                'machine_id' => 1,
                 'graph_id' => 101,
                 'graph_name' => 'Process Rate'
             ], [
@@ -78,6 +86,14 @@ class GraphSeeder extends Seeder
                 'graph_name' => 'Recipe'
             ], [
                 'machine_id' => 2,
+                'graph_id' => 20,
+                'graph_name' => 'Downtime History'
+            ], [
+                'machine_id' => 2,
+                'graph_id' => 21,
+                'graph_name' => 'Downtime By Type(Reason)'
+            ], [
+                'machine_id' => 2,
                 'graph_id' => 101,
                 'graph_name' => 'Blender Capability'
             ], [
@@ -114,6 +130,14 @@ class GraphSeeder extends Seeder
                 'machine_id' => 3,
                 'graph_id' => 5,
                 'graph_name' => 'Accumulated Hauloff Length'
+            ], [
+                'machine_id' => 3,
+                'graph_id' => 20,
+                'graph_name' => 'Downtime History'
+            ], [
+                'machine_id' => 3,
+                'graph_id' => 21,
+                'graph_name' => 'Downtime By Type(Reason)'
             ],
 
             [
@@ -124,6 +148,14 @@ class GraphSeeder extends Seeder
                 'machine_id' => 4,
                 'graph_id' => 2,
                 'graph_name' => 'Energy Consumption'
+            ], [
+                'machine_id' => 4,
+                'graph_id' => 20,
+                'graph_name' => 'Downtime History'
+            ], [
+                'machine_id' => 4,
+                'graph_id' => 21,
+                'graph_name' => 'Downtime By Type(Reason)'
             ],
 
             [
@@ -148,6 +180,14 @@ class GraphSeeder extends Seeder
                 'graph_name' => 'Online Life'
             ], [
                 'machine_id' => 5,
+                'graph_id' => 20,
+                'graph_name' => 'Downtime History'
+            ], [
+                'machine_id' => 5,
+                'graph_id' => 21,
+                'graph_name' => 'Downtime By Type(Reason)'
+            ], [
+                'machine_id' => 5,
                 'graph_id' => 101,
                 'graph_name' => 'Pumps Online States'
             ], [
@@ -170,6 +210,14 @@ class GraphSeeder extends Seeder
                 'graph_name' => 'Hopper Air Temperature'
             ], [
                 'machine_id' => 6,
+                'graph_id' => 20,
+                'graph_name' => 'Downtime History'
+            ], [
+                'machine_id' => 6,
+                'graph_id' => 21,
+                'graph_name' => 'Downtime By Type(Reason)'
+            ], [
+                'machine_id' => 6,
                 'graph_id' => 101,
                 'graph_name' => 'Bed States'
             ], [
@@ -190,6 +238,14 @@ class GraphSeeder extends Seeder
                 'machine_id' => 7,
                 'graph_id' => 1,
                 'graph_name' => 'Capacity Utilization'
+            ], [
+                'machine_id' => 7,
+                'graph_id' => 20,
+                'graph_name' => 'Downtime History'
+            ], [
+                'machine_id' => 7,
+                'graph_id' => 21,
+                'graph_name' => 'Downtime By Type(Reason)'
             ],
 
             [
@@ -200,6 +256,14 @@ class GraphSeeder extends Seeder
                 'machine_id' => 8,
                 'graph_id' => 2,
                 'graph_name' => 'Energy Consumption'
+            ], [
+                'machine_id' => 8,
+                'graph_id' => 20,
+                'graph_name' => 'Downtime History'
+            ], [
+                'machine_id' => 8,
+                'graph_id' => 21,
+                'graph_name' => 'Downtime By Type(Reason)'
             ],
 
             [
@@ -214,6 +278,14 @@ class GraphSeeder extends Seeder
                 'machine_id' => 9,
                 'graph_id' => 3,
                 'graph_name' => 'Process Out Temperature'
+            ], [
+                'machine_id' => 9,
+                'graph_id' => 20,
+                'graph_name' => 'Downtime History'
+            ], [
+                'machine_id' => 9,
+                'graph_id' => 21,
+                'graph_name' => 'Downtime By Type(Reason)'
             ],
 
             [
@@ -228,7 +300,15 @@ class GraphSeeder extends Seeder
                 'machine_id' => 11,
                 'graph_id' => 3,
                 'graph_name' => 'Capacity Utilization'
-            ]
+            ], [
+                'machine_id' => 11,
+                'graph_id' => 20,
+                'graph_name' => 'Downtime History'
+            ], [
+                'machine_id' => 11,
+                'graph_id' => 21,
+                'graph_name' => 'Downtime By Type(Reason)'
+            ],
         ];
         
         DB::table('graphs')->insert($graphs);

@@ -61,10 +61,43 @@ class DefaultCustomizationsSeeder extends Seeder
             ]
         ];
 
+        $bd_blender = [
+            [
+                "id"=> 13710,
+                "name"=> "Actual Weight[1]",
+                "configuration_id"=> 1,
+                "tag_id"=> 14,
+                "type"=> "line",
+                "offset"=> 0,
+                "divided_by"=> 1000
+            ],
+            [
+                "id"=> 13711,
+                "name"=> "Actual Weight[2]",
+                "configuration_id"=> 1,
+                "tag_id"=> 14,
+                "type"=> "line",
+                "offset"=> 1,
+                "divided_by"=> 1000
+            ],
+            [
+                "id"=> 13696,
+                "name"=> "Process Rate",
+                "configuration_id"=> 1,
+                "tag_id"=> 18,
+                "type"=> "line",
+                "offset"=> 0,
+                "divided_by"=> 1
+            ]
+        ];
+
         $customizations = [
             [
                 'machine_id' => MACHINE_NGX_DRYER,
                 'customization' => json_encode($ngx_dryer)
+            ], [
+                'machine_id' => MACHINE_BD_BATCH_BLENDER,
+                'customization' => json_encode($bd_blender)
             ]
         ];
 
