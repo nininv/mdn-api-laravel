@@ -2932,6 +2932,11 @@ class MachineController extends Controller
 					"from" => strtotime("-12 hours"),
 					"to" => time()
 				];
+            case 'last8Hours':
+                return [
+                    "from" => strtotime("-8 hours"),
+                    "to" => time()
+                ];
 			case 'last24Hours':
 				return [
 					"from" => strtotime("-1 day"),

@@ -911,7 +911,7 @@ class DeviceController extends Controller
             }
 
             $device->status = $runningStatus;
-
+            $device->downtimeByReason = $this->getDowntimeByReasonForMachine($device->serial_number);
             $capacity_utilization = $this->getCapacityUtilizationForMachine($device->serial_number, $device->machine_id);
             $device->capacityUtilization = $capacity_utilization;
         }
@@ -1888,7 +1888,7 @@ class DeviceController extends Controller
 
         return $items;
     }
-    
+
     // update machines table default header option
     public function setMachinesTableDefaultHeader(Request $request)
     {
@@ -1897,6 +1897,36 @@ class DeviceController extends Controller
         $headers = $request['headers'];
         $user_customization = UserCustomizations::where('user_id', $user->id)->first();
         $headerOption = $this->getMachinesTableKeyName($request->name);
+
+        if ($user_customization) {
+            $customization = json_decode($user_customization->customization);
+            $customization->$headerOption = $headers;
+
+            $user_customization->update([
+				'user_id' => $user->id,
+				'customization' => json_encode($customization)
+			]);
+        } else {
+            $options = new stdClass();
+            $options->$headerOption = $headers;
+
+            UserCustomizations::create([
+				'user_id' => $user->id,
+				'customization' => json_encode($options)
+			]);
+        }
+
+        return response()->json(['User state has been updated.']);
+    }
+
+    // Set saved machines table headers
+    public function setSavedMachinesTableDefaultHeader(Request $request)
+    {
+        $user = $request->user('api');
+        $path_name = $request->name;
+        $headers = $request['headers'];
+        $user_customization = UserCustomizations::where('user_id', $user->id)->first();
+        $headerOption = $this->getSavedMachinesTableKeyName($request->name);
 
         if ($user_customization) {
             $customization = json_decode($user_customization->customization);
@@ -1940,6 +1970,27 @@ class DeviceController extends Controller
         return response()->json(compact('headers'));
     }
 
+    // Get saved machines table headers for users
+    public function getSavedMachinesTableHeaders(Request $request)
+    {
+        $user = $request->user('api');
+        $customization = UserCustomizations::where('user_id', $user->id)->first();
+        $headerOption = $this->getSavedMachinesTableKeyName($request->name);
+
+        if ($customization) {
+            $option = json_decode($customization->customization);
+            if (isset($option->$headerOption)) {
+                $headers = $option->$headerOption;
+            } else {
+                $headers = null;
+            }
+        } else {
+            $headers = null;
+        }
+
+        return response()->json(compact('headers'));
+    }
+
     // Get customization option name
     public function getMachinesTableKeyName($name)
     {
@@ -1952,6 +2003,19 @@ class DeviceController extends Controller
                 break;
             case 'zone-dashboard':
                 return 'zoneMachinesTableHeader';
+                break;
+        }
+    }
+
+    // Get saved machines table customization option name
+    public function getSavedMachinesTableKeyName($name)
+    {
+        switch($name) {
+            case 'dashboard-analytics':
+                return 'companySavedMachinesTableHeader';
+                break;
+            case 'location-dashboard':
+                return 'locationSavedMachinesTableHeader';
                 break;
         }
     }
