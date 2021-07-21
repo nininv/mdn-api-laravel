@@ -1311,7 +1311,7 @@ class MachineController extends Controller
 						->first()) {
 				try {
 					$machine_states->pump_status = json_decode($pump_status_object->values)[0];
-				} catch(Exception $e) {
+				} catch(\Exception $e) {
 					$machine_states->pump_status = 0;
 				}
 			}
@@ -1322,7 +1322,7 @@ class MachineController extends Controller
 				->first()) {
 				try {
 					$machine_states->heater_status = json_decode($heater_status_object->values)[0];
-				} catch(Exception $e) {
+				} catch(\Exception $e) {
 					$machine_states->heater_status = 0;
 				}
 			}
@@ -1333,7 +1333,7 @@ class MachineController extends Controller
 				->first()) {
 				try {
 					$machine_states->vent_status = json_decode($vent_status_object->values)[0];
-				} catch(Exception $e) {
+				} catch(\Exception $e) {
 					$machine_states->vent_status = 0;
 				}
 			}

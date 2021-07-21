@@ -27,7 +27,7 @@ trait MailTrait
         try {
             $response = $sendgrid->send($email);
             return $response;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             echo 'Caught exception: '.  $e->getMessage(). "\n";
         }
 	}

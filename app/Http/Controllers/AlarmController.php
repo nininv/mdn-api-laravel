@@ -35,7 +35,7 @@ class AlarmController extends Controller
 			foreach ($alarm_types as $key => $alarm_type) {
 				$alarm_tag_ids[] = $alarm_type->tag_id;
 			}
-			
+
 			$device->alarms_count = DeviceData::where('device_id', $device->serial_number)->whereIn('tag_id', $alarm_tag_ids)->count();
 		}
 
@@ -182,9 +182,8 @@ class AlarmController extends Controller
 				$alarm->timestamp = $alarm_object->timestamp * 1000;
 				if($alarm_type->bytes == 0 && $alarm_type->offset == 0)
 					$alarm->active = $value32[0];
-				else if($alarm_type->bytes == 0 && $alarm_type->offset != 0) {
-					$offset = isset($tag['offset']) ? $tag['offset'] : 0;
-					$alarm->active = !!$value32[$offset] == true;
+				else if($alarm_type->bytes == 0 && $alarm_type->offset != 0 && isset($value32[$alarm_type->offset])) {
+					$alarm->active = !!$value32[$alarm_type->offset] == true;
 				} else if($alarm_type->bytes != 0) {
 					$alarm->active = ($value32[0] >> $alarm_type->offset) & $alarm_type->bytes;
 				}
@@ -268,7 +267,7 @@ class AlarmController extends Controller
 		}
 
 		$alarmsCount = count($active_alarms);
-		
+
 		return response()->json(compact('active_alarms', 'alarmsCount'));
 	}
 
@@ -279,17 +278,16 @@ class AlarmController extends Controller
 
 		return $alarm_types;
 	}
-	
-	public function getMachineIdByMachineName($machine_name) {		
-		$machineInfo = Device::select('machine_id', 'serial_number')->where('customer_assigned_name', $machine_name)->get()->first();
 
-		return $machineInfo;
+	public function getMachineIdByMachineName($machine_name)
+    {
+		return Device::select('machine_id', 'serial_number')->where('customer_assigned_name', $machine_name)->first();
 	}
 
 	public function getAssignedMachinesByCompanyId($company_id) {
 		// $query = 'SELECT machines.id, machines.name FROM devices INNER JOIN machines ON devices.machine_id = machines.id WHERE devices.company_id = ' . $company_id;
 		// $assigned_machines = DB::select(DB::raw($query));
-		
+
 		$assigned_machines = Device::select('machines.id', 'machines.name')
 									->join('machines', 'devices.machine_id', '=', 'machines.id')
 									->where('devices.company_id', $company_id)
@@ -302,16 +300,16 @@ class AlarmController extends Controller
 			// $query = 'SELECT alarm_types.name, alarm_types.machine_id, alarm_types.tag_id, alarm_types.machine_id FROM alarm_types WHERE alarm_types.machine_id = '. $machine_id;
 			$alarm_types = AlarmType::select('name', 'machine_id', 'tag_id', 'offset')
 									->where('machine_id', $machine_id)
-									->get();			
+									->get();
 		} else {
 			$assigned_devices = Device::select('machine_id')->where('company_id', $company_id)->get();
 			$machine_ids = [];
 			foreach($assigned_devices as $assigned_device) {
 				$machine_ids[] = $assigned_device['machine_id'];
 			}
-	
-			// $query = 'SELECT alarm_types.name, alarm_types.machine_id, alarm_types.tag_id, alarm_types.machine_id FROM alarm_types WHERE alarm_types.machine_id IN (' 
-			// 	. implode("," , $machine_ids) . 
+
+			// $query = 'SELECT alarm_types.name, alarm_types.machine_id, alarm_types.tag_id, alarm_types.machine_id FROM alarm_types WHERE alarm_types.machine_id IN ('
+			// 	. implode("," , $machine_ids) .
 			// 	')';
 			$alarm_types = AlarmType::select('name', 'machine_id', 'tag_id', 'offset')
 				->whereIn('machine_id', $machine_ids)
@@ -324,9 +322,9 @@ class AlarmController extends Controller
 			$tag_ids = array_merge($tag_ids, [json_decode($alarm_type->tag_id)]);
 		}
 
-		// $query = 'SELECT device_data.tag_id, device_data.timestamp, device_data.values, device_data.machine_id from device_data WHERE device_data.tag_id IN (' 
+		// $query = 'SELECT device_data.tag_id, device_data.timestamp, device_data.values, device_data.machine_id from device_data WHERE device_data.tag_id IN ('
 		// 			. implode("," , $tag_ids) . ') AND device_data.customer_id = ' . $company_id;
-
+        $device_data = [];
 		if ($machine_id) {
 			// $query .= ' AND device_data.machine_id = ' . $machine_id;
 			$device_data = Alarm::select('tag_id', 'timestamp', 'values', 'machine_id')
@@ -409,7 +407,7 @@ class AlarmController extends Controller
 
 		usort($device_data, function ($a, $b) {
 			return $b->values - $a->values;
-		});	
+		});
 
 		return $device_data;
 	}
@@ -430,7 +428,7 @@ class AlarmController extends Controller
 				if ($i == 3)
 					break;
 			}
-		}		
+		}
 		return response()->json(compact('severity'));
 	}
 
