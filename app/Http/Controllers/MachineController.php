@@ -1010,7 +1010,7 @@ class MachineController extends Controller
 										->orderBy('timestamp')
 										->get();
 
-		$process_rate = $this->averagedSeries($process_rates_object);
+		$process_rate = $this->averagedSeries($process_rates_object, $process_rates_object->count(), 1);
 
 		$items = [$process_rate];
 		return response()->json(compact('items', 'isImperial'));
@@ -1042,9 +1042,9 @@ class MachineController extends Controller
 									->orderBy('timestamp')
 									->get();
 
-				$utilizations = $this->averagedSeries($utilizations_object, 200, 10);
+				$utilizations = $this->averagedSeries($utilizations_object, $utilizations_object->count(), 10);
 			} else {
-				$utilizations = $this->averagedSeries($utilizations_object, 200, 10);
+				$utilizations = $this->averagedSeries($utilizations_object, $utilizations_object->count(), 10);
 			}
 		} else {
 			$tag_utilization = Tag::where('tag_name', 'capacity_utilization')->where('configuration_id', $request->machineId)->first();
@@ -1055,13 +1055,14 @@ class MachineController extends Controller
 
 			$utilizations_object = DB::table('utilizations')
 									->where('serial_number', $request->serialNumber)
+									->where('machine_id', $request->machineId)
 									->where('tag_id', $tag_utilization->tag_id)
 									->where('timestamp', '>', $from)
 									->where('timestamp', '<', $to)
 									->orderBy('timestamp')
 									->get();
 
-			$utilizations = $this->averagedSeries($utilizations_object, 200, 10);
+			$utilizations = $this->averagedSeries($utilizations_object, $utilizations_object->count(), 10);
 
 		}
 		$utilizationsSeries = new stdClass();
@@ -1117,7 +1118,7 @@ class MachineController extends Controller
 										->where('timestamp', '<', $to)
 										->get();
 
-		$energy_consumption = $this->averagedSeries($energy_consumptions_object, 200, 10);
+		$energy_consumption = $this->averagedSeries($energy_consumptions_object, $energy_consumptions_object->count(), 10);
 
 		$items = [$energy_consumption];
 
@@ -1234,7 +1235,7 @@ class MachineController extends Controller
 										->latest('timedata')
 										->get();
 
-		$process_rate = $this->averagedSeries($process_rates_object);
+		$process_rate = $this->averagedSeries($process_rates_object, $process_rates_object->count(), 1);
 
 		$items = [$process_rate];
 
@@ -1401,7 +1402,7 @@ class MachineController extends Controller
 										->orderBy('timestamp')
 										->get();
 
-		$capabilities = $this->averagedSeries($capabilities_object);
+		$capabilities = $this->averagedSeries($capabilities_object, $capabilities_object->count(), 1);
 
 		$items = [$capabilities];
 
@@ -1431,7 +1432,7 @@ class MachineController extends Controller
 										->orderBy('timestamp')
 										->get();
 
-		$rates = $this->averagedSeries($rates_object);
+		$rates = $this->averagedSeries($rates_object, $rates_object->count(), 1);
 
 		$items = [$rates];
 
