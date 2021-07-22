@@ -130,6 +130,7 @@ Route::group(['prefix' => 'devices'], function () {
 	Route::post('/get-machines-table-headers', 'DeviceController@getMachinesTableHeaders')->middleware('auth');
 	Route::post('/set-saved-machines-table-default-headers', 'DeviceController@setSavedMachinesTableDefaultHeader')->middleware('auth');
 	Route::post('/get-saved-machines-table-headers', 'DeviceController@getSavedMachinesTableHeaders')->middleware('auth');
+	Route::post('/set-machines-table-default-sort-options', 'DeviceController@setMachinestableDefaultSortOptions')->middleware('auth');
 });
 
 Route::group(['prefix' => 'machine-tags'], function () {
