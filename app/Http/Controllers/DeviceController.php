@@ -1893,7 +1893,6 @@ class DeviceController extends Controller
     public function setMachinesTableDefaultHeader(Request $request)
     {
         $user = $request->user('api');
-        $path_name = $request->name;
         $headers = $request['headers'];
         $user_customization = UserCustomizations::where('user_id', $user->id)->first();
         $headerOption = $this->getMachinesTableKeyName($request->name);
@@ -1919,11 +1918,38 @@ class DeviceController extends Controller
         return response()->json(['User state has been updated.']);
     }
 
+    // Update machines table sort options
+    public function setMachinestableDefaultSortOptions(Request $request)
+    {
+        $user = $request->user('api');
+        $user_customization = UserCustomizations::where('user_id', $user->id)->first();
+        $headerOption = $this->getMachinesTableKeyName($request->name) . 'SortOption';
+
+        if ($user_customization) {
+            $customization = json_decode($user_customization->customization);
+            $customization->$headerOption = $request->sortOption;
+
+            $user_customization->update([
+                'user_id' => $user->id,
+                'customization' => json_encode($customization)
+            ]);
+        } else {
+            $options = new stdClass();
+            $options->$headerOption = $request->sortOption;
+
+            UserCustomization::create([
+                'user_id' => $user->id,
+				'customization' => json_encode($options)
+            ]);
+        }
+
+        return response()->json(['User state has been updated.']);
+    }
+
     // Set saved machines table headers
     public function setSavedMachinesTableDefaultHeader(Request $request)
     {
         $user = $request->user('api');
-        $path_name = $request->name;
         $headers = $request['headers'];
         $user_customization = UserCustomizations::where('user_id', $user->id)->first();
         $headerOption = $this->getSavedMachinesTableKeyName($request->name);
@@ -1955,6 +1981,7 @@ class DeviceController extends Controller
         $user = $request->user('api');
         $customization = UserCustomizations::where('user_id', $user->id)->first();
         $headerOption = $this->getMachinesTableKeyName($request->name);
+        $sortOption = $this->getMachinesTableKeyName($request->name) . 'SortOption';
 
         if ($customization) {
             $option = json_decode($customization->customization);
@@ -1963,11 +1990,23 @@ class DeviceController extends Controller
             } else {
                 $headers = null;
             }
+            if (isset($option->$sortOption)) {
+                $sortOption = $option->$sortOption;
+            } else {
+                $sortOption = [
+                    'sortBy' => ['location_id'],
+                    'sortDesc' => [false]
+                ];
+            }
         } else {
             $headers = null;
+            $sortOption = [
+                'sortBy' => ['location_id'],
+                'sortDesc' => [false]
+            ];
         }
 
-        return response()->json(compact('headers'));
+        return response()->json(compact('headers', 'sortOption'));
     }
 
     // Get saved machines table headers for users
