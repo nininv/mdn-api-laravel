@@ -66,7 +66,7 @@ class MachineController extends Controller
 
     public function averagedSeries($collection, $series_count = 200, $devide_by = 1) {
     	$total = $collection->count();
-		$chunks = $collection->chunk($total / $series_count + 1);
+		$chunks = $collection->chunk($total / $series_count);
 
 		$ret = $chunks->map(function($chunk) use ($devide_by) {
 			$timestamp = ($chunk->first()->timestamp) * 1000;
