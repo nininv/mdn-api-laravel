@@ -1943,7 +1943,7 @@ class DeviceController extends Controller
             $options = new stdClass();
             $options->$headerOption = $request->sortOption;
 
-            UserCustomization::create([
+            UserCustomizations::create([
                 'user_id' => $user->id,
 				'customization' => json_encode($options)
             ]);
