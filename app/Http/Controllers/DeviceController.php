@@ -844,11 +844,15 @@ class DeviceController extends Controller
 
             $device->status = $runningStatus;
 
-            $downtime_by_reason = $this->getDowntimeByReasonForMachine($device->serial_number);
+            $start = strtotime("-8 Hours");
+            $end = time();
+
+            $downtime_by_reason = $this->getDowntimeByReasonForMachine($device->serial_number, $start, $end);
             $capacity_utilization = $this->getCapacityUtilizationForMachine($device->serial_number, $device->machine_id);
 
             $device->downtimeByReason = $downtime_by_reason;
             $device->capacityUtilization = $capacity_utilization;
+            $device->machineType = isset($device->configuration) ? $device->configuration['name'] : '';
         }
 
         return response()->json(compact('devices'));
@@ -914,6 +918,7 @@ class DeviceController extends Controller
             $device->downtimeByReason = $this->getDowntimeByReasonForMachine($device->serial_number);
             $capacity_utilization = $this->getCapacityUtilizationForMachine($device->serial_number, $device->machine_id);
             $device->capacityUtilization = $capacity_utilization;
+            $device->machineType = isset($device->configuration) ? $device->configuration['name'] : '';
         }
 
         return response()->json(compact('devices'));
@@ -984,6 +989,7 @@ class DeviceController extends Controller
             $capacity_utilization = $this->getCapacityUtilizationForMachine($device->serial_number, $device->machine_id);
             $device->capacityUtilization = $capacity_utilization;
             $device->downtimeByReason = $downtime_by_reason;
+            $device->machineType = isset($device->configuration) ? $device->configuration['name'] : '';
         }
 
         return response()->json(compact('devices'));
@@ -1486,7 +1492,7 @@ class DeviceController extends Controller
 
     public function getDowntimeByReasonForMachine($device_id, $start = 0, $end = 0)
     {
-        if (!$start) $start = strtotime("-1 day");
+        if (!$start) $start = strtotime("-8 Hours");
         if (!$end) $end = time();
 
         $query = "select
@@ -1842,7 +1848,7 @@ class DeviceController extends Controller
 
     public function getCapacityUtilizationForMachine($serial_number, $machine_id)
     {
-        $from = strtotime("-1 day");
+        $from = strtotime("-8 Hours");
         $to = time();
 
         if ($machine_id == 11) {
@@ -1851,8 +1857,8 @@ class DeviceController extends Controller
                 ->where('tag_id', 28)
                 ->where('timestamp', '>', $from)
                 ->where('timestamp', '<', $to)
-                ->orderBy('timestamp')
-                ->get();
+                ->latest('timestamp')
+                ->first();
 
             if (!$utilizations_object) {
                 $utilizations_object = DB::table('utilizations')
@@ -1860,17 +1866,17 @@ class DeviceController extends Controller
                     ->where('tag_id', 29)
                     ->where('timestamp', '>', $from)
                     ->where('timestamp', '<', $to)
-                    ->orderBy('timestamp')
-                    ->get();
+                    ->latest('timestamp')
+                    ->first();
             }
 
-            $utilizations = $this->averagedSeries($utilizations_object, 200, 10);
+            $utilizations = $utilizations_object ? round(json_decode($utilizations_object->values)[0] / 10, 2) : null;
 
         } else {
             $tag_utilization = Tag::where('tag_name', 'capacity_utilization')->where('configuration_id', $machine_id)->first();
 
             if (!$tag_utilization) {
-                return [[]];
+                return null;
             }
 
             $utilizations_object = DB::table('utilizations')
@@ -1878,15 +1884,15 @@ class DeviceController extends Controller
                 ->where('tag_id', $tag_utilization->tag_id)
                 ->where('timestamp', '>', $from)
                 ->where('timestamp', '<', $to)
-                ->orderBy('timestamp')
-                ->get();
+                ->latest('timestamp')
+                ->first();
 
-            $utilizations = $this->averagedSeries($utilizations_object, 200, 10);
+            $utilizations = $utilizations_object ? round(json_decode($utilizations_object->values)[0] / 10, 2) : null;
 
         }
-        $items = [$utilizations];
+        $item = $utilizations;
 
-        return $items;
+        return $item;
     }
 
     // update machines table default header option
