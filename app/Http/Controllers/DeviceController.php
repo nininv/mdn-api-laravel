@@ -1986,6 +1986,7 @@ class DeviceController extends Controller
     {
         $user = $request->user('api');
         $customization = UserCustomizations::where('user_id', $user->id)->first();
+        $pathName = $request->name;
         $headerOption = $this->getMachinesTableKeyName($request->name);
         $sortOption = $this->getMachinesTableKeyName($request->name) . 'SortOption';
 
@@ -2012,13 +2013,14 @@ class DeviceController extends Controller
             ];
         }
 
-        return response()->json(compact('headers', 'sortOption'));
+        return response()->json(compact('headers', 'sortOption', 'pathName'));
     }
 
     // Get saved machines table headers for users
     public function getSavedMachinesTableHeaders(Request $request)
     {
         $user = $request->user('api');
+        $pathName = $request->name;
         $customization = UserCustomizations::where('user_id', $user->id)->first();
         $headerOption = $this->getSavedMachinesTableKeyName($request->name);
 
@@ -2033,7 +2035,7 @@ class DeviceController extends Controller
             $headers = null;
         }
 
-        return response()->json(compact('headers'));
+        return response()->json(compact('headers', 'pathName'));
     }
 
     // Get customization option name
