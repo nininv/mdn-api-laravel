@@ -2001,15 +2001,15 @@ class DeviceController extends Controller
                 $sortOption = $option->$sortOption;
             } else {
                 $sortOption = [
-                    'sortBy' => ['location_id'],
-                    'sortDesc' => [false]
+                    'sortBy' => ['zone_id'],
+                    'sortDesc' => [true]
                 ];
             }
         } else {
             $headers = null;
             $sortOption = [
-                'sortBy' => ['location_id'],
-                'sortDesc' => [false]
+                'sortBy' => ['zone_id'],
+                'sortDesc' => [true]
             ];
         }
 
