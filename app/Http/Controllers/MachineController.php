@@ -1096,7 +1096,7 @@ class MachineController extends Controller
 
 		$utilizationsSeries->name = 'Utilization';
 		$utilizationsSeries->type = 'area';
-		$utilizationsSeries->data = $utilizations ? $utilizations->toArray() : null;
+		$utilizationsSeries->data = $utilizations ? $utilizations->toArray() : [];
 		$averageSeries->name = 'Average Value';
 		$averageSeries->type = 'line';
 		$averageSeries->data = $averageData;
