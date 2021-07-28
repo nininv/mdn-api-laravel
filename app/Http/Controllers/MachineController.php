@@ -1033,7 +1033,7 @@ class MachineController extends Controller
 									->orderBy('timestamp')
 									->get();
 
-			if (!$utilizations_object) {
+			if (!count($utilizations_object->toArray())) {
 				$utilizations_object = DB::table('utilizations')
 									->where('serial_number', $request->serialNumber)
 									->where('tag_id', 29)
@@ -1042,7 +1042,11 @@ class MachineController extends Controller
 									->orderBy('timestamp')
 									->get();
 
-				$utilizations = $this->averagedSeries($utilizations_object, $utilizations_object->count(), 10);
+				if (count($utilizations_object->toArray())) {
+					$utilizations = $this->averagedSeries($utilizations_object, $utilizations_object->count(), 10);
+				} else {
+					$utilizations = null;
+				}
 			} else {
 				$utilizations = $this->averagedSeries($utilizations_object, $utilizations_object->count(), 10);
 			}
@@ -1062,12 +1066,16 @@ class MachineController extends Controller
 									->orderBy('timestamp')
 									->get();
 
-			$utilizations = $this->averagedSeries($utilizations_object, $utilizations_object->count(), 10);
+			if (count($utilizations_object->toArray())) {
+				$utilizations = $this->averagedSeries($utilizations_object, $utilizations_object->count(), 10);
+			} else {
+				$utilizations = null;
+			}
 
 		}
 		$utilizationsSeries = new stdClass();
 		$averageSeries = new stdClass();
-		if (count($utilizations->toArray()) != 0) {
+		if ($utilizations && count($utilizations->toArray()) != 0) {
 			$totalUtilization = array_sum(array_map(
 				function($item) {
 					return $item[1];
@@ -1080,13 +1088,15 @@ class MachineController extends Controller
 
 		$averageData = [];
 
-		foreach ($utilizations as $utilization) {
-			array_push($averageData, [$utilization[0], $averageUtilization]);
+		if ($utilizations) {
+			foreach ($utilizations as $utilization) {
+				array_push($averageData, [$utilization[0], $averageUtilization]);
+			}
 		}
 
 		$utilizationsSeries->name = 'Utilization';
 		$utilizationsSeries->type = 'area';
-		$utilizationsSeries->data = $utilizations->toArray();
+		$utilizationsSeries->data = $utilizations ? $utilizations->toArray() : null;
 		$averageSeries->name = 'Average Value';
 		$averageSeries->type = 'line';
 		$averageSeries->data = $averageData;
