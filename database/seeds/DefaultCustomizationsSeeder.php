@@ -15,7 +15,7 @@ class DefaultCustomizationsSeeder extends Seeder
 
         $ngx_dryer = [
             [
-                "id"=> 13680,
+                "id"=> 14903,
                 "name"=> "Dew Point Temperature",
                 "configuration_id"=> 6,
                 "tag_id"=> 18,
@@ -24,7 +24,7 @@ class DefaultCustomizationsSeeder extends Seeder
                 "divided_by"=> 1
             ],
             [
-                "id"=> 13708,
+                "id"=> 14931,
                 "name"=> "Dirty Filter Bit",
                 "configuration_id"=> 6,
                 "tag_id"=> 39,
@@ -33,7 +33,7 @@ class DefaultCustomizationsSeeder extends Seeder
                 "divided_by"=> 1
             ],
             [
-                "id"=> 13682,
+                "id"=> 14905,
                 "name"=> "Regen Left Air Temperature",
                 "configuration_id"=> 6,
                 "tag_id"=> 20,
@@ -42,7 +42,7 @@ class DefaultCustomizationsSeeder extends Seeder
                 "divided_by"=> 1
             ],
             [
-                "id"=> 13683,
+                "id"=> 14906,
                 "name"=> "Regen Right Air Temperature",
                 "configuration_id"=> 6,
                 "tag_id"=> 21,
@@ -51,7 +51,7 @@ class DefaultCustomizationsSeeder extends Seeder
                 "divided_by"=> 1
             ],
             [
-                "id"=> 13673,
+                "id"=> 14896,
                 "name"=> "Drying Hopper 1 Outlet Air Temperature",
                 "configuration_id"=> 6,
                 "tag_id"=> 11,
@@ -63,7 +63,7 @@ class DefaultCustomizationsSeeder extends Seeder
 
         $bd_blender = [
             [
-                "id"=> 13337,
+                "id"=> 14560,
                 "name"=> "Actual Weight[1]",
                 "configuration_id"=> 1,
                 "tag_id"=> 14,
@@ -72,7 +72,7 @@ class DefaultCustomizationsSeeder extends Seeder
                 "divided_by"=> 1000
             ],
             [
-                "id"=> 13338,
+                "id"=> 14561,
                 "name"=> "Actual Weight[2]",
                 "configuration_id"=> 1,
                 "tag_id"=> 14,
@@ -81,7 +81,7 @@ class DefaultCustomizationsSeeder extends Seeder
                 "divided_by"=> 1000
             ],
             [
-                "id"=> 13325,
+                "id"=> 14548,
                 "name"=> "Process Rate",
                 "configuration_id"=> 1,
                 "tag_id"=> 18,

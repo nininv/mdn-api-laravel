@@ -42,19 +42,19 @@ class SettingController extends Controller
                     ->delete();
 
         Setting::where('type', 'color_background')->first()->update([
-            'value' => '#ffffff'
+            'value' => '#eeeeef'
         ]);
         Setting::where('type', 'color_primary')->first()->update([
-            'value' => '#ff8300'
+            'value' => '#096288'
         ]);
         Setting::where('type', 'color_secondary')->first()->update([
-            'value' => '#818a8f'
+            'value' => '#c8c62e'
         ]);
         Setting::where('type', 'color_accent')->first()->update([
-            'value' => '#333333'
+            'value' => '#0f2d52'
         ]);
         Setting::where('type', 'color_surface')->first()->update([
-            'value' => '#6dbe4b'
+            'value' => '#29b1b8'
         ]);
         Setting::where('type', 'page_title')->first()->update([
             'value' => 'ACS Digital Solutions'
