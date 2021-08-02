@@ -65,29 +65,6 @@ class Device extends Model
         return $this->hasOne(DeviceCheckin::class, 'device_id', 'serial_number');
     }
 
-    public function isRunning() {
-        if (!$config = $this->configuration) {
-            return false;
-        }
-
-        $tag = Tag::where('configuration_id', $config->id)
-            ->where('tag_name', Tag::NAMES['RUNNING'])
-            ->first();
-
-        if ($tag) {
-            $running = Running::where('device_id', $this->serial_number)
-                ->where('tag_id', $tag->tag_id)
-                ->latest('timestamp')
-                ->first();
-
-            if ($running) {
-                return json_decode($running->values)[0];
-            }
-        }
-
-        return false;
-    }
-
     public function scopeWhereSimActive($query, $filters = [])
     {
         if (is_array($filters) && in_array('active', $filters)) {
