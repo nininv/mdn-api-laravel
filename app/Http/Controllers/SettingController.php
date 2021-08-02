@@ -54,7 +54,19 @@ class SettingController extends Controller
             'value' => '#0f2d52'
         ]);
         Setting::where('type', 'color_surface')->first()->update([
+            'value' => '#5a5d61'
+        ]);
+        Setting::where('type', 'color_success')->first()->update([
+            'value' => '#06d6a0'
+        ]);
+        Setting::where('type', 'color_info')->first()->update([
             'value' => '#29b1b8'
+        ]);
+        Setting::where('type', 'color_warning')->first()->update([
+            'value' => '#ffd166'
+        ]);
+        Setting::where('type', 'color_error')->first()->update([
+            'value' => '#623266'
         ]);
         Setting::where('type', 'page_title')->first()->update([
             'value' => 'ACS Digital Solutions'

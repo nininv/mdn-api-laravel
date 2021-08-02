@@ -47,7 +47,7 @@ class MachinesReportExport implements FromArray, WithHeadings, WithTitle, Should
                         $value = json_decode($object->values)[$offset] / $divide_by;
                     }
 
-                    return [$object->timedata, $tag['name'], round($value, 3)];
+                    return [$object->timestamp, $tag['name'], round($value, 3)];
                 })
                 ->toArray()
         ), true);
