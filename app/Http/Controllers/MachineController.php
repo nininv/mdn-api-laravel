@@ -2533,6 +2533,8 @@ class MachineController extends Controller
 
 						if ($decimal) {
 							$decimal_point = round(json_decode($decimal->values)[$offset] / 1000, 3);
+						} else {
+							$decimal_point = 0;
 						}
 
 						return [($object->timestamp) * 1000, $value * 1000 + $decimal_point];
