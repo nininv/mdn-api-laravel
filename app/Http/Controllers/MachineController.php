@@ -2525,7 +2525,20 @@ class MachineController extends Controller
 					} else {
 						$value = json_decode($object->values)[$offset] / $divide_by;
 					}
-					return [($object->timestamp) * 1000, round($value, 3)];
+					if ($object->machine_id = 1 && $object->tag_id = 15) {
+						$decimal = DeviceData::where('machine_id', 1)
+							->where('tag_id', 16)
+							->where('timestamp', $object->timestamp)
+							->first();
+
+						if ($decimal) {
+							$decimal_point = round(json_decode($decimal->values)[$offset] / 1000, 3);
+						}
+
+						return [($object->timestamp) * 1000, $value * 1000 + $decimal_point];
+					} else {
+						return [($object->timestamp) * 1000, round($value, 3)];
+					}
 				});
 			} else {
 				$ss = [];
