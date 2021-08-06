@@ -2053,6 +2053,15 @@ class DeviceController extends Controller
             case 'zone-dashboard':
                 return 'zoneMachinesTableHeader';
                 break;
+            case 'acs-machines':
+                return 'companyMachinesTableHeader';
+                break;
+            case 'location-acs-dashboard':
+                return 'locationMachinesTableHeader';
+                break;
+            case 'zone-acs-dashboard':
+                return 'zoneMachinesTableHeader';
+                break;
         }
     }
 
@@ -2064,6 +2073,12 @@ class DeviceController extends Controller
                 return 'companySavedMachinesTableHeader';
                 break;
             case 'location-dashboard':
+                return 'locationSavedMachinesTableHeader';
+                break;
+            case 'acs-machines':
+                return 'companySavedMachinesTableHeader';
+                break;
+            case 'location-acs-dashboard':
                 return 'locationSavedMachinesTableHeader';
                 break;
         }
