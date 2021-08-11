@@ -1010,7 +1010,7 @@ class MachineController extends Controller
 										->orderBy('timestamp')
 										->get();
 
-		$process_rate = $this->averagedSeries($process_rates_object, $process_rates_object->count(), 1);
+		$process_rate = $process_rates_object->count() ? $this->averagedSeries($process_rates_object, $process_rates_object->count(), 1) : [];
 
 		$items = [$process_rate];
 		return response()->json(compact('items', 'isImperial'));
