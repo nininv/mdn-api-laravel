@@ -77,7 +77,7 @@ return [
     */
 
     'from' => [
-        'address' => env('SENDGRID_FROM_EMAIL', 'hello@example.com'),
+        'address' => env('SENDGRID_FROM_EMAIL', 'service@mivue.com'),
         'name' => env('SENDGRID_FROM_NAME', 'Example'),
     ],
 
