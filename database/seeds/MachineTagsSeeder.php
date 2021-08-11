@@ -23,7 +23,7 @@ class MachineTagsSeeder extends Seeder
             [ 'name' => 'Serial Number Year', 'configuration_id' => MACHINE_BD_BATCH_BLENDER, 'tag_id' => 7, 'type' => 'line', 'offset' => 0, 'divided_by' => 1 ],
             [ 'name' => 'Serial Number Unit', 'configuration_id' => MACHINE_BD_BATCH_BLENDER, 'tag_id' => 8, 'type' => 'line', 'offset' => 0, 'divided_by' => 1 ],
             [ 'name' => 'Number of Hoppers', 'configuration_id' => MACHINE_BD_BATCH_BLENDER, 'tag_id' => 52, 'type' => 'line', 'offset' => 0, 'divided_by' => 1 ],
-            [ 'name' => 'Blender Status', 'configuration_id' => MACHINE_BD_BATCH_BLENDER, 'tag_id' => 9, 'type' => 'line', 'offset' => 0, 'divided_by' => 1 ],
+            [ 'name' => 'Running', 'configuration_id' => MACHINE_BD_BATCH_BLENDER, 'tag_id' => 9, 'type' => 'line', 'offset' => 0, 'divided_by' => 1 ],
             [ 'name' => 'Idle', 'configuration_id' => MACHINE_BD_BATCH_BLENDER, 'tag_id' => 53, 'type' => 'line', 'offset' => 0, 'divided_by' => 1 ],
             [ 'name' => 'Batch Size', 'configuration_id' => MACHINE_BD_BATCH_BLENDER, 'tag_id' => 11, 'type' => 'line', 'offset' => 0, 'divided_by' => 10 ],
             [ 'name' => 'Batch Counter', 'configuration_id' => MACHINE_BD_BATCH_BLENDER, 'tag_id' => 12, 'type' => 'line', 'offset' => 0, 'divided_by' => 1 ],
