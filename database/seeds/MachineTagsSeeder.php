@@ -98,7 +98,7 @@ class MachineTagsSeeder extends Seeder
             [ 'name' => 'Serial Number Year', 'configuration_id' => MACHINE_ACCUMETER_OVATION_CONTINUOUS_BLENDER, 'tag_id' => 7, 'type' => 'line', 'offset' => 0, 'divided_by' => 1 ],
             [ 'name' => 'Serial Number Unit', 'configuration_id' => MACHINE_ACCUMETER_OVATION_CONTINUOUS_BLENDER, 'tag_id' => 8, 'type' => 'line', 'offset' => 0, 'divided_by' => 1 ],
             [ 'name' => 'Manual Mode Engaged', 'configuration_id' => MACHINE_ACCUMETER_OVATION_CONTINUOUS_BLENDER, 'tag_id' => 9, 'type' => 'line', 'offset' => 0, 'divided_by' => 1 ],
-            [ 'name' => 'Blender Status', 'configuration_id' => MACHINE_ACCUMETER_OVATION_CONTINUOUS_BLENDER, 'tag_id' => 10, 'type' => 'line', 'offset' => 0, 'divided_by' => 1 ],
+            [ 'name' => 'Running', 'configuration_id' => MACHINE_ACCUMETER_OVATION_CONTINUOUS_BLENDER, 'tag_id' => 10, 'type' => 'line', 'offset' => 0, 'divided_by' => 1 ],
             [ 'name' => 'Current Recipe[1]', 'configuration_id' => MACHINE_ACCUMETER_OVATION_CONTINUOUS_BLENDER, 'tag_id' => 11, 'type' => 'line', 'offset' => 0, 'divided_by' => 1 ],
             [ 'name' => 'Current Recipe[2]', 'configuration_id' => MACHINE_ACCUMETER_OVATION_CONTINUOUS_BLENDER, 'tag_id' => 11, 'type' => 'line', 'offset' => 1, 'divided_by' => 1 ],
             [ 'name' => 'Current Recipe[3]', 'configuration_id' => MACHINE_ACCUMETER_OVATION_CONTINUOUS_BLENDER, 'tag_id' => 11, 'type' => 'line', 'offset' => 2, 'divided_by' => 1 ],
