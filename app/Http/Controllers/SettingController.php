@@ -69,7 +69,7 @@ class SettingController extends Controller
             'value' => '#623266'
         ]);
         Setting::where('type', 'page_title')->first()->update([
-            'value' => 'ACS Digital Solutions'
+            'value' => 'MiVue Manufacturing Insight'
         ]);
 
         return response()->json([
