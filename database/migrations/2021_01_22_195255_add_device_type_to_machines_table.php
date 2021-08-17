@@ -14,10 +14,14 @@ class AddDeviceTypeToMachinesTable extends Migration
     public function up()
     {
         Schema::table('machines', function (Blueprint $table) {
-            $table->integer('device_type')->default(0);
+            if (!Schema::hasColumn('machines', 'device_type')) {
+                $table->integer('device_type')->default(0);
+            }
         });
         Schema::table('machines', function (Blueprint $table) {
-            $table->dropColumn('serial_number');
+            if (Schema::hasColumn('machines', 'serial_number')) {
+                $table->dropColumn('serial_number');
+            }
         });
     }
 
@@ -29,10 +33,14 @@ class AddDeviceTypeToMachinesTable extends Migration
     public function down()
     {
         Schema::table('machines', function (Blueprint $table) {
-            $table->string('serial_number', 20)->default('');
+            if (!Schema::hasColumn('machines', 'serial_number')) {
+                $table->string('serial_number', 20)->default('');
+            }
         });
         Schema::table('machines', function (Blueprint $table) {
-            $table->dropColumn('device_type');
+            if (Schema::hasColumn('machines', 'device_type')) {
+                $table->dropColumn('device_type');
+            }
         });
     }
 }

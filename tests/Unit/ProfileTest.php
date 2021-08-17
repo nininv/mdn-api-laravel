@@ -16,7 +16,8 @@ class ProfileTest extends TestCase
     public function test_profile_belongs_to_a_user()
     {
         $user = factory(User::class)->create();
-        $profile = factory(Profile::class)->create(['user_id' => $user->id]); 
+
+        $profile = factory(Profile::class)->create(['user_id' => $user->id]);
 
         $this->assertInstanceOf(User::class, $profile->user);
     }

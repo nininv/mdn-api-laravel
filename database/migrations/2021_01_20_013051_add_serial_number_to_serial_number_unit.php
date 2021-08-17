@@ -14,7 +14,9 @@ class AddSerialNumberToSerialNumberUnit extends Migration
     public function up()
     {
         Schema::table('serial_number_unit', function (Blueprint $table) {
-            $table->string('serial_number', 20)->default('');
+            if (!Schema::hasColumn('serial_number_unit', 'serial_number')) {
+                $table->string('serial_number', 20)->default('');
+            }
         });
     }
 

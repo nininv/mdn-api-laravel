@@ -21,8 +21,10 @@ class AddCompanyIdToZones extends Migration
 //            $table->unsignedBigInteger('customer_id')->nullable()->change();
         });
 
-        DB::statement('ALTER TABLE zones
+        if (env('DB_CONNECTION', 'sqlite') !== 'sqlite') {
+            DB::statement('ALTER TABLE zones
                    ALTER COLUMN customer_id SET default NULL');
+        }
 
         User::all()->each(function ($user, $key) {
             Zone::where('customer_id', $user->id)->update([

@@ -7,13 +7,13 @@ use Faker\Generator as Faker;
 
 $factory->define(Profile::class, function (Faker $faker) {
     return [
-    	'address_1' => $this->faker->address,
-		'address_2' => $this->faker->address,
-		'zip' => $this->faker->postcode,
-		'state' => $this->faker->state,
-		'city' => $this->faker->city,
-		'country' => $this->faker->country,
-		'phone' => $this->faker->phoneNumber,
-		'user_id' => 1,
+    	'address_1' => $faker->address,
+		'address_2' => $faker->address,
+		'zip' => $faker->postcode,
+		'state' => $faker->state,
+		'city' => $faker->city,
+		'country' => $faker->country,
+		'phone' => $faker->phoneNumber,
+		'user_id' => 1
     ];
 });

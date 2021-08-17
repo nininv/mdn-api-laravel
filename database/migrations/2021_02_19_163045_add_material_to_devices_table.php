@@ -29,9 +29,11 @@ class AddMaterialToDevicesTable extends Migration
      */
     public function down()
     {
-        Schema::table('devices', function (Blueprint $table) {
-            $table->dropColumn('material_id');
-            $table->dropColumn('material_location_id');
-        });
+        if (env('DB_CONNECTION', 'sqlite') !== 'sqlite') {
+            Schema::table('devices', function (Blueprint $table) {
+                $table->dropColumn('material_id');
+                $table->dropColumn('material_location_id');
+            });
+        }
     }
 }

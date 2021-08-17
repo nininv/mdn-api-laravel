@@ -27,10 +27,12 @@ class AddSerialNumberAndMultipledByToThresholds extends Migration
      */
     public function down()
     {
-        Schema::table('thresholds', function (Blueprint $table) {
-            $table->dropColumn('multipled_by');
-            $table->dropColumn('serial_number');
-            $table->dropColumn('bytes');
-        });
+        if (env('DB_CONNECTION', 'sqlite') !== 'sqlite') {
+            Schema::table('thresholds', function (Blueprint $table) {
+                $table->dropColumn('multipled_by');
+                $table->dropColumn('serial_number');
+                $table->dropColumn('bytes');
+            });
+        }
     }
 }

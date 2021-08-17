@@ -16,7 +16,7 @@ class CreateReasonIdToDowntimes extends Migration
         Schema::table('downtimes', function (Blueprint $table) {
             $table->dropColumn('reason');
             $table->integer('reason_id')->default(5);
-            
+
             $table->foreign('reason_id')->references('id')->on('downtime_reasons');
         });
     }
@@ -29,7 +29,9 @@ class CreateReasonIdToDowntimes extends Migration
     public function down()
     {
         Schema::table('downtimes', function (Blueprint $table) {
-            $table->dropColumn('reason_id');
+            if (Schema::hasColumn('downtimes', 'reason_id')) {
+                $table->dropColumn('reason_id');
+            }
         });
     }
 }
