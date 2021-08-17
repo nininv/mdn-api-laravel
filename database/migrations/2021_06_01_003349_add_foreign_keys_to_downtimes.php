@@ -34,12 +34,14 @@ class AddForeignKeysToDowntimes extends Migration
      */
     public function down()
     {
-        Schema::table('downtimes', function (Blueprint $table) {
-            $table->dropColumn('running_start_id');
-            $table->dropColumn('running_end_id');
-            $table->dropColumn('idle_start_id');
-            $table->dropColumn('idle_end_id');
-            $table->dropColumn('foreign_type');
-        });
+        if (env('DB_CONNECTION', 'sqlite') !== 'sqlite') {
+            Schema::table('downtimes', function (Blueprint $table) {
+                $table->dropColumn('running_start_id');
+                $table->dropColumn('running_end_id');
+                $table->dropColumn('idle_start_id');
+                $table->dropColumn('idle_end_id');
+                $table->dropColumn('foreign_type');
+            });
+        }
     }
 }

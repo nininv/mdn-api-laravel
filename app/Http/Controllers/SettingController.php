@@ -14,7 +14,7 @@ class SettingController extends Controller
     public function getSetting()
     {
         $value = Setting::all();
-        
+
         return response()->json([
     		'value' => $value
         ]);
@@ -79,13 +79,13 @@ class SettingController extends Controller
 
     public function uploadLogo(Request $request)
     {
-        $validator = Validator::make($request->all(), [ 
+        $validator = Validator::make($request->all(), [
             'logo' => 'required|image'
         ]);
 
         if ($validator->fails())
         {
-            return response()->json(['error'=>$validator->errors()], 422);            
+            return response()->json(['error'=>$validator->errors()], 422);
         }
 
         $file = $request->file('logo');
@@ -117,7 +117,7 @@ class SettingController extends Controller
 
         if ($validator->fails())
         {
-            return response()->json(['error'=>$validator->errors()], 422);            
+            return response()->json(['error'=>$validator->errors()], 422);
         }
 
         $file = $request->file('image');
@@ -150,12 +150,12 @@ class SettingController extends Controller
 
         if ($validator->fails())
         {
-            return response()->json(['error'=>$validator->errors()], 422);            
+            return response()->json(['error'=>$validator->errors()], 422);
         }
 
         $product_name = Setting::where('type', 'product_name')->first();
         if (!$product_name) {
-            Setting::create([
+            $product_name = Setting::create([
                 'type' => 'product_name',
                 'value' => $request->productName
             ]);
@@ -166,7 +166,7 @@ class SettingController extends Controller
 
         $product_version = Setting::where('type', 'product_version')->first();
         if (!$product_version) {
-            Setting::create([
+            $product_version = Setting::create([
                 'type' => 'product_version',
                 'value' => $request->productVersion
             ]);
@@ -190,7 +190,7 @@ class SettingController extends Controller
 
         if ($validator->fails())
         {
-            return response()->json(['error'=>$validator->errors()], 422);            
+            return response()->json(['error'=>$validator->errors()], 422);
         }
 
         $page_title = Setting::where('type', 'page_title')->first();
@@ -261,7 +261,7 @@ class SettingController extends Controller
             }
 
             $idx = rand(0, count($results) - 1);
-            $image_url = $results[$idx]->urls->regular;            
+            $image_url = $results[$idx]->urls->regular;
             $auth_background = Setting::where('type', 'auth_background_filepath')->first();
             if(!$auth_background) {
                 Setting::create([

@@ -14,7 +14,9 @@ class AddSerialNumberToUtilizations extends Migration
     public function up()
     {
         Schema::table('utilizations', function (Blueprint $table) {
-            $table->string('serial_number', 20)->default('');
+            if (!Schema::hasColumn('utilizations', 'serial_number')) {
+                $table->string('serial_number', 20)->default('');
+            }
         });
     }
 

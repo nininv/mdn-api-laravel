@@ -21,8 +21,10 @@ class AddCompanyIdToLocations extends Migration
             //$table->unsignedBigInteger('customer_id')->nullable()->change();
         });
 
-        DB::statement('ALTER TABLE locations
+        if (env('DB_CONNECTION', 'sqlite') !== 'sqlite') {
+            DB::statement('ALTER TABLE locations
                     ALTER COLUMN customer_id SET default NULL');
+        }
 
         User::all()->each(function ($user, $key) {
             Location::where('customer_id', $user->id)->update([

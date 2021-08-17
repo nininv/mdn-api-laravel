@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 class AddDeviceIdToHopperClearedTime extends Migration
 {
@@ -18,11 +19,13 @@ class AddDeviceIdToHopperClearedTime extends Migration
             $table->unsignedBigInteger('machine_id')->default(1);
         });
 
-        DB::statement('ALTER TABLE hopper_cleared_time
+        if (env('DB_CONNECTION', 'sqlite') !== 'sqlite') {
+            DB::statement('ALTER TABLE hopper_cleared_time
                     ALTER COLUMN serial_number SET default 0');
-        
-        DB::statement('ALTER TABLE hopper_cleared_time
+
+            DB::statement('ALTER TABLE hopper_cleared_time
                     ALTER COLUMN serial_number TYPE bigint USING serial_number::bigint');
+        }
     }
 
     /**

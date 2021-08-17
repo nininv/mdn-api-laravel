@@ -14,7 +14,12 @@ class AddTagIdToActiveAlarms extends Migration
     public function up()
     {
         Schema::table('active_alarms', function (Blueprint $table) {
-            $table->unsignedBigInteger('tag_id');
+
+            if (env('DB_CONNECTION', 'sqlite') !== 'sqlite') {
+                $table->unsignedBigInteger('tag_id');
+            } else {
+                $table->unsignedBigInteger('tag_id')->default('');
+            }
         });
     }
 

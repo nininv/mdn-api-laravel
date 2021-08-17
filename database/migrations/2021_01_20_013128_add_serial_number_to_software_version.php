@@ -14,7 +14,9 @@ class AddSerialNumberToSoftwareVersion extends Migration
     public function up()
     {
         Schema::table('software_version', function (Blueprint $table) {
-            $table->string('serial_number', 20)->default('');
+            if (!Schema::hasColumn('software_version', 'serial_number')) {
+                $table->string('serial_number', 20)->default('');
+            }
         });
     }
 
