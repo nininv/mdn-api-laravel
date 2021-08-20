@@ -16,6 +16,7 @@ class CreateMaterialsTable extends Migration
         Schema::create('materials', function (Blueprint $table) {
             $table->id();
             $table->string('material');
+            $table->unsignedBigInteger('company_id')->nullable()->index();
             $table->timestamps();
 
             $table->index(['material', 'id']);
