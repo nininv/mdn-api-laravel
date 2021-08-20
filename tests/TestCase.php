@@ -2,10 +2,15 @@
 
 namespace Tests;
 
+use App\Location;
 use App\Profile;
 use App\Role;
 use App\User;
 use App\UserRole;
+use App\Company;
+use App\Zone;
+use App\Material;
+use App\MaterialLocation;
 use Faker\Factory as Faker;
 //use Faker\Generator as Faker;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
@@ -112,7 +117,11 @@ abstract class TestCase extends BaseTestCase
 
     public function getFilledUserData(Role $role): User
     {
-        $user = factory(User::class)->create();
+        $company = factory(Company::class)->create();
+
+        $user = factory(User::class)->create([
+            'company_id' => $company->id
+        ]);
 
         factory(UserRole::class)->create([
             'user_id' => $user->id,
@@ -135,5 +144,25 @@ abstract class TestCase extends BaseTestCase
             'country' => $this->faker->country,
             'phone' => $this->faker->phoneNumber
         ]);
+
+        $location = factory(Location::class)->create([
+            'customer_id' => $user->id
+        ]);
+
+        factory(Zone::class)->create([
+            'location_id' => $location->id,
+            'customer_id' => $user->id,
+            'company_id' => $user->company_id
+        ]);
+
+        factory(Material::class)->create([
+            'company_id' => $user->company_id
+        ]);
+
+        factory(MaterialLocation::class)->create([
+            'company_id' => $user->company_id
+        ]);
+
+        return $user;
     }
 }

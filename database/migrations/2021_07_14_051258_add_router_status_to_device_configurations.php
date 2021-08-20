@@ -26,9 +26,11 @@ class AddRouterStatusToDeviceConfigurations extends Migration
      */
     public function down()
     {
-        Schema::table('device_configurations', function (Blueprint $table) {
-            $table->dropColumn('router_status');
-            $table->dropColumn('router_update_time');
-        });
+        if (env('DB_CONNECTION', 'sqlite') !== 'sqlite') {
+            Schema::table('device_configurations', function (Blueprint $table) {
+                $table->dropColumn('router_status');
+                $table->dropColumn('router_update_time');
+            });
+        }
     }
 }

@@ -32,13 +32,13 @@ class DowntimePlanController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['error'=>$validator->errors()], 422);            
+            return response()->json(['error'=>$validator->errors()], 422);
         }
 
         $user = $request->user('api');
 
         DowntimePlan::create([
-            'company_id' => $user->company->id,
+            'company_id' => $user->company_id,
             'machine_id' => $request->machine,
             'reason' => $request->reason,
             'date_from' => $request->dateFrom,
@@ -46,8 +46,6 @@ class DowntimePlanController extends Controller
             'time_from' => $request->timeFrom,
             'time_to' => $request->timeTo,
         ]);
-
-        $downtimePlans = $user->company->downtimePlans;
 
         return response()->json('Created successfully');
     }
@@ -65,7 +63,7 @@ class DowntimePlanController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['error'=>$validator->errors()], 422);            
+            return response()->json(['error'=>$validator->errors()], 422);
         }
 
         $plan->machine_id = $request->machine;

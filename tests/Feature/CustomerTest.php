@@ -43,12 +43,7 @@ class CustomerTest extends TestCase
 
     public function test_validation_update_error()
     {
-        $data = [
-            'address_1' => $this->faker->address,
-            'user_id' => $this->getAcsAdminUser()->id
-        ];
-
-        $this->postJson('/api/customers/update-profile/' . $this->getAcsAdminUser()->id, $data)
+        $this->postJson('/api/customers/update-profile/' . $this->getAcsAdminUser()->id, [])
             ->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
             ->assertJsonStructure([
                 'error'

@@ -26,9 +26,11 @@ class AddEmailSmsToThresholds extends Migration
      */
     public function down()
     {
-        Schema::table('thresholds', function (Blueprint $table) {
-            $table->dropColumn('sms_checked');
-            $table->dropColumn('email_checked');
-        });
+        if (env('DB_CONNECTION', 'sqlite') !== 'sqlite') {
+            Schema::table('thresholds', function (Blueprint $table) {
+                $table->dropColumn('sms_checked');
+                $table->dropColumn('email_checked');
+            });
+        }
     }
 }

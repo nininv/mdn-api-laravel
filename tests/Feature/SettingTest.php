@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Profile;
 use App\Setting;
 use App\Swatch;
 use Illuminate\Http\UploadedFile;
