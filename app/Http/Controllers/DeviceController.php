@@ -408,7 +408,7 @@ class DeviceController extends Controller
         $device->machine_id = $request->machine_id;
         $device->tcu_added = $request->tcu_added;
         $device->plc_ip = $request->plc_ip;
-        $device->name = $request->device_name;
+        $device->customer_assigned_name = $request->device_name;
 
         $device->save();
 
