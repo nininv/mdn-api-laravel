@@ -20,6 +20,9 @@ class CreateSystemInventoriesTable extends Migration
             $table->unsignedBigInteger('location_id')->nullable();
             $table->unsignedBigInteger('hopper_id');
             $table->unsignedBigInteger('serial_number');
+            $table->unsignedBigInteger('company_id');
+
+            $table->foreign('company_id')->references('id')->on('companies');
             $table->timestamps();
         });
     }
