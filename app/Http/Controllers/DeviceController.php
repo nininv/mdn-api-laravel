@@ -188,13 +188,12 @@ class DeviceController extends Controller
 
     public function getACSDevices(Request $request)
     {
-
         $devices_paginated = Device::orderBy('sim_status')
             ->orderBy('id')
             ->whereVisibleOnly()
-            ->whereSimActive($request->filterForm['filters'])
-            ->wherePlcLink($request->filterForm['filters'])
-            ->whereRegistered($request->filterForm['filters'])
+            ->whereSimActive($request->filterForm['filters'] ?? [])
+            ->wherePlcLink($request->filterForm['filters'] ?? [])
+            ->whereRegistered($request->filterForm['filters'] ?? [])
             ->whereSearchQuery($request->filterForm['searchQuery'] ?? '')
             ->with('checkin')
             ->paginate(config('settings.num_per_page'));
@@ -336,13 +335,13 @@ class DeviceController extends Controller
         return response()->json(compact('devices'));
     }
 
-    public function importDevices(Request $request)
+    public function importDevices(Request $request, Client $client)
     {
         $existing_devices = Device::all();
         $numAdded = 0;
         $numDuplicates = 0;
 
-        $client = new Client();
+//        $client = new Client();
         try {
             $response = $client->get(
                 $this->teltonika_import_url,
@@ -393,9 +392,12 @@ class DeviceController extends Controller
 
     public function deviceAssigned(Request $request)
     {
-
         $validator = Validator::make($request->all(), [
-            'plc_ip' => 'required'
+            'plc_ip' => 'required',
+            'device_id' => 'required',
+            'company_id' => 'required',
+            'machine_id' => 'required',
+            'device_name' => 'required|nullable',
         ]);
 
         if ($validator->fails()) {

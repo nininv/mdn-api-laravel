@@ -7,7 +7,7 @@ use Faker\Generator as Faker;
 
 $factory->define(Device::class, function (Faker $faker) {
     return [
-        'device_id' => $faker->randomNumber(6),
+        'device_id' => random_int(810126, 890126),
         'name' => $faker->name,
         'customer_assigned_name' => $faker->name,
         'serial_number' => random_int(1109634623, 1909634623),
@@ -17,7 +17,9 @@ $factory->define(Device::class, function (Faker $faker) {
         'public_ip_sim' => null,
         'machine_id' => 1,
         'company_id' => 1,
-        'registered' => false
+        'registered' => false,
+        'plc_ip' => $faker->ipv4,
+        'tcu_added' => false
     ];
 });
 

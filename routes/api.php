@@ -5,7 +5,8 @@ use Illuminate\Support\Facades\Route;
 // Authentication api routes
 Route::post('auth/check', 'UserController@check');
 Route::post('auth/signin', 'UserController@login');
-Route::post('auth/signup', 'UserController@register');
+//there is no signup page in our project now, and no "register" method in UserController
+//Route::post('auth/signup', 'UserController@register');
 Route::post('auth/password-reset', 'UserController@passwordReset');
 
 Route::middleware('auth')->group(function () {
@@ -103,7 +104,8 @@ Route::group(['prefix' => 'devices'], function () {
 	Route::post('/', 'DeviceController@getACSDevices')->middleware('auth:acs_admin,acs_manager,acs_viewer');
 	Route::post('/import', 'DeviceController@importDevices')->middleware('auth:acs_admin,acs_manager');
 	Route::post('/device-assigned', 'DeviceController@deviceAssigned')->middleware('auth:acs_admin,acs_manager');
-	Route::post('/suspend-device', 'DeviceController@suspendDevice')->middleware('auth:acs_admin,acs_manager');
+	//There is no suspendDevice method in the DeviceController and apparently for a long time. I can't find the "devices/suspend-device" route in the front-end either.
+//	Route::post('/suspend-device', 'DeviceController@suspendDevice')->middleware('auth:acs_admin,acs_manager');
 	Route::post('/device-configuration', 'DeviceController@sendDeviceConfiguration')->middleware('auth:acs_admin,acs_manager');
 	Route::post('/enabled-properties', 'DeviceController@updateEnabledProperties');
 	Route::post('/get-downtime-graph-data', 'DeviceController@getDowntimeGraphData');
