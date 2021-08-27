@@ -19,6 +19,7 @@ class MaterialTracks extends Migration
             $table->unsignedBigInteger('start')->nullable();
             $table->unsignedBigInteger('stop')->nullable();
             $table->boolean('in_progress')->default(false);
+            $table->json('initial_materials')->nullable();
 
             $table->foreign('inventory_material_id')->references('id')->on('inventory_materials');
 

@@ -19,7 +19,6 @@ class CreateSerialNumberUnitTable extends Migration
             $table->unsignedBigInteger('tag_id');
             $table->unsignedBigInteger('timestamp');
             $table->json('values');
-            $table->unsignedBigInteger('customer_id')->default(0);
             $table->unsignedBigInteger('machine_id')->default(0);
             $table->unsignedBigInteger('serial_number')->nullable();
         });

@@ -33,6 +33,7 @@ class CreateInventoryMaterialsTable extends Migration
             $table->unsignedBigInteger('location7_id')->nullable();
             $table->unsignedBigInteger('material8_id')->nullable();
             $table->unsignedBigInteger('location8_id')->nullable();
+            $table->unsignedBigInteger('company_id')->nullable();
 
             $table->foreign('material1_id')->references('id')->on('materials');
             $table->foreign('material2_id')->references('id')->on('materials');
@@ -50,6 +51,7 @@ class CreateInventoryMaterialsTable extends Migration
             $table->foreign('location6_id')->references('id')->on('material_locations');
             $table->foreign('location7_id')->references('id')->on('material_locations');
             $table->foreign('location8_id')->references('id')->on('material_locations');
+            $table->foreign('company_id')->references('id')->on('companies');
 
             $table->timestamps();
         });
