@@ -1819,7 +1819,7 @@ class MachineController extends Controller
 
 		return response()->json([
 			'items' => $items,
-			'unit' => '℃',
+			'unit' => '°F',
 			'hopperCount' => $hopperCount ? json_decode($hopperCount->values)[0] : 1
 		]);
 	}
