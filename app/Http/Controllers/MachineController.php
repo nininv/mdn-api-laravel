@@ -1705,7 +1705,7 @@ class MachineController extends Controller
 										->get();
 
 		$temperatures = $temperatures_object->map(function($t) {
-			return [$t->timestamp * 1000, round((json_decode($t->values)[0] - 32) * 5 / 9, 2)];
+			return [$t->timestamp * 1000, round(json_decode($t->values)[0], 2)];
 		});
 
 		$items = [$temperatures];
@@ -1732,7 +1732,7 @@ class MachineController extends Controller
 
 			if($obj) {
 				$data = $obj->map(function($t) {
-					return [$t->timestamp * 1000, round((json_decode($t->values)[0] - 32) * 5 / 9, 2)];
+					return [$t->timestamp * 1000, round(json_decode($t->values)[0], 2)];
 				});
 
 				$rg_l = new stdClass();
